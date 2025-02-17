@@ -18,6 +18,7 @@ import 'package:divine_soul_yoga/login/login.dart';
 import 'package:divine_soul_yoga/models/testimonialsmodel.dart';
 import 'package:divine_soul_yoga/models/usermodel.dart';
 import 'package:divine_soul_yoga/provider/userprovider.dart';
+import 'package:divine_soul_yoga/utils/logout_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,7 +32,7 @@ import 'dart:developer';
 
 class HomeScreen extends StatefulWidget {
   final String? userId;
-  
+
   const HomeScreen({
     this.userId,
     Key? key,
@@ -85,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     getUserData();
     // _fetchProfileData();
     ApiService().testimonialsData();
-
   }
 
   Future<void> getUserData() async {
@@ -279,28 +279,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.monetization_on_outlined, color: Color(0xffD45700),),
+                leading: Icon(
+                  Icons.monetization_on_outlined,
+                  color: Color(0xffD45700),
+                ),
                 title: Text('Subscription'),
                 onTap: () {
                   // Navigate to Home
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => SubscriptionScreen()
-                    ),
+                    MaterialPageRoute(
+                        builder: (context) => SubscriptionScreen()),
                   );
                 },
               ),
               ListTile(
-                leading: Icon(Icons.event_available, color: Color(0xffD45700),),
+                leading: Icon(
+                  Icons.event_available,
+                  color: Color(0xffD45700),
+                ),
                 title: Text('Attended Events'),
                 onTap: () {
                   // Navigate to Home
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => Attendedevent(userId: profileProvider.profileData!['user']['id']
-                        .toString(),
-
-                    )),
+                    MaterialPageRoute(
+                        builder: (context) => Attendedevent(
+                              userId: profileProvider.profileData!['user']['id']
+                                  .toString(),
+                            )),
                   );
                 },
               ),
@@ -359,7 +366,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     );
                   }),
               ListTile(
-                  leading: Icon(Icons.pentagon, color: Color(0xffD45700),),
+                  leading: Icon(
+                    Icons.pentagon,
+                    color: Color(0xffD45700),
+                  ),
                   title: Text('Feedback'),
                   onTap: () {
                     Navigator.push(
@@ -368,14 +378,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     );
                   }),
               ListTile(
-                  leading: const Icon(
-                    Icons.logout,
-                    color: Color(0xffD45700),
-                  ),
-                  title: const Text('Logout'),
-                  onTap: () async {
-                    clearPreferencesAndNavigate(context);
-                  }),
+                leading: const Icon(
+                  Icons.logout,
+                  color: Color(0xffD45700),
+                ),
+                title: const Text('Logout'),
+                onTap: () {
+                  Navigator.pop(context);
+                  LogoutDialog.show(context);
+                },
+              ),
             ],
           ),
         ),
@@ -391,7 +403,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           height: 20,
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 22, left: 5, bottom: 15, right: 22),
+                          padding: const EdgeInsets.only(
+                              top: 22, left: 5, bottom: 15, right: 22),
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -409,7 +422,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     profileProvider.isLoading
                                         ? SizedBox()
                                         : Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
                                             children: [
                                               RichText(
                                                   text: TextSpan(
@@ -424,7 +438,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                     ),
                                                   ),
                                                   TextSpan(
-                                                    text: profileProvider.profileData?["user"]?["name"]?.split(' ')[0] ?? '',
+                                                    text: profileProvider
+                                                            .profileData?[
+                                                                "user"]?["name"]
+                                                            ?.split(' ')[0] ??
+                                                        '',
                                                     style: GoogleFonts.gotu(
                                                       color: Color(0xffD45700),
                                                       fontSize: 22,
@@ -895,8 +913,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ],
                     ),
                     if (activeTabs == 1) const Programtab(),
-                    if (activeTabs == 2)  Events(userId: profileProvider.profileData!['user']['id']
-                        .toString(),),
+                    if (activeTabs == 2)
+                      Events(
+                        userId: profileProvider.profileData!['user']['id']
+                            .toString(),
+                      ),
                     if (activeTabs == 3) const Studio(),
                     if (activeTabs == 4) Gallery(),
                     // if (activeTabs == 5) const Programtab(),
@@ -935,7 +956,8 @@ class _SwipeableCardState extends State<SwipeableCard> {
   }
 
   void fetchTestimonials() async {
-    final TestimonialsResponse? response = await ApiService().testimonialsData();
+    final TestimonialsResponse? response =
+        await ApiService().testimonialsData();
     if (response != null) {
       print("API Response: $response");
       if (response.data.isNotEmpty) {
@@ -969,81 +991,87 @@ class _SwipeableCardState extends State<SwipeableCard> {
           child: testimonialsList.isEmpty
               ? Center(child: Text("No testimonials available"))
               : PageView.builder(
-            controller: _controller,
-            itemCount: testimonialsList.length,
-            itemBuilder: (context, index) {
-              final test = testimonialsList[index];
-              return Column(
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.4,
-                    child: Center(
-                      child: Container(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Stack(
-                            children: [
-                              Image.asset(
-                                "assets/images/preview1.png",
-                                height: 500,
-                              ),
-                              Positioned.fill(
-                                child: Center(
-                                  child: SizedBox(
-                                    height: MediaQuery.of(context).size.height * 0.35, // Ensure a fixed height
-
-                                    child: SingleChildScrollView(
-                                      padding: EdgeInsets.symmetric(horizontal: 10),
+                  controller: _controller,
+                  itemCount: testimonialsList.length,
+                  itemBuilder: (context, index) {
+                    final test = testimonialsList[index];
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: Center(
+                            child: Container(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      "assets/images/preview1.png",
+                                      height: 500,
+                                    ),
+                                    Positioned.fill(
                                       child: Center(
-                                        child: Text(
-                                          test.detail ?? "No detail available",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w300,
-                                            color: Color(0xff666666),
+                                        child: SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.35, // Ensure a fixed height
+
+                                          child: SingleChildScrollView(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Center(
+                                              child: Text(
+                                                test.detail ??
+                                                    "No detail available",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w300,
+                                                  color: Color(0xff666666),
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
                                           ),
-                                          textAlign: TextAlign.center,
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15, bottom: 15),
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        test.name ?? 'No name available',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w300,
-                            color: Color(0xffD45700)),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 15, bottom: 15),
+                          child: Container(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              test.name ?? 'No name available',
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w300,
+                                  color: Color(0xffD45700)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 5, bottom: 20),
           child: SmoothPageIndicator(
             controller: _controller,
             count: testimonialsList.length,
-            effect: WormEffect(dotHeight: 8, dotWidth: 8, activeDotColor: Color(0xffD45700)),
+            effect: WormEffect(
+                dotHeight: 8, dotWidth: 8, activeDotColor: Color(0xffD45700)),
           ),
         ),
       ],
     );
   }
-
 }

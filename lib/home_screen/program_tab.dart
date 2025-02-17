@@ -54,73 +54,73 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return isLoading
         ? Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
-    )
+            height: MediaQuery.of(context).size.height * 0.4,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
         : Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: arrProgramData!.length,
+                  padding: EdgeInsets.zero,
+                  itemCount: arrProgramData!.length,
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index){
-                return Align(
-                  alignment: Alignment.center,
-                  child: InkWell(
-                    onTap: () {
-                       print("Progarms Lang: ${arrProgramData![index]['id'].toString()}");
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
+                  itemBuilder: (context, index) {
+                    return Align(
+                      alignment: Alignment.center,
+                      child: InkWell(
+                        onTap: () {
+                          print(
+                              "Progarms Lang: ${arrProgramData![index]['id'].toString()}");
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
 
-                            //builder: (context) => MeditationCourseList(id: 2)));
-                              builder: (context) =>
-                            // ListOfDays(courseId: arrProgramData![index]['id'].toString(),)
-                                  CourseOverviewScreen(type: arrProgramData![index]['id'].toString(),)
-                          ));
+                                  //builder: (context) => MeditationCourseList(id: 2)));
+                                  builder: (context) =>
+                                      // ListOfDays(courseId: arrProgramData![index]['id'].toString(),)
+                                      CourseOverviewScreen(
+                                        type: arrProgramData![index]['id']
+                                            .toString(),
+                                      )));
 
-                      // print('http://68.183.83.189/${arrProgramData![i]["image"].toString()}');
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Stack(
-                        //alignment: AlignmentDirectional.center,
-                          children: [
-                            Image.network(
-                              //color: Colors.black.withOpacity(1.0),
-                              'https://divinesoulyoga.in/${arrProgramData![index]['image']}',
-                              fit: BoxFit.fill,
-                              width: MediaQuery.of(context).size.width,
-                              //height: MediaQuery.of(context).size.height * 0.2,
-                            ),
-
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5, top: 20),
-                              child: Container(
-                                width: 200,
-                                child: Text(
-                                  arrProgramData![index]['name'],
-                                  //arrProgramData![i]["title"],
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xffFFFFFF)),
-                                  textAlign: TextAlign.center,
+                          // print('http://68.183.83.189/${arrProgramData![i]["image"].toString()}');
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Stack(
+                              //alignment: AlignmentDirectional.center,
+                              children: [
+                                Image.network(
+                                  //color: Colors.black.withOpacity(1.0),
+                                  'https://divinesoulyoga.in/${arrProgramData![index]['image']}',
+                                  fit: BoxFit.fill,
+                                  width: MediaQuery.of(context).size.width,
+                                  //height: MediaQuery.of(context).size.height * 0.2,
                                 ),
-                              ),
-                            )
-                          ]),
-                    ),
-                  ),
-                );
-              }),
-
-
-
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 5, top: 20),
+                                  child: Container(
+                                    width: 200,
+                                    child: Text(
+                                      arrProgramData![index]['name'],
+                                      //arrProgramData![i]["title"],
+                                      style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xffFFFFFF)),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                )
+                              ]),
+                        ),
+                      ),
+                    );
+                  }),
               Padding(
                 padding: const EdgeInsets.all(25.0),
                 child: Text(
@@ -131,7 +131,6 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                       color: Color(0xffD45700)),
                 ),
               ),
-
               SizedBox(
                 height: 10,
               ),
@@ -157,7 +156,7 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                                     width: 5,
                                   ),
                                   Text(
-                                    "Bliss\n Maditation",
+                                    "Bliss\n Meditation",
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
@@ -299,7 +298,6 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-
               Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Card(
@@ -309,7 +307,6 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                     // top: 10, right: 20, left: 20, bottom: 20),
                     child: Column(
                       children: [
-
                         SizedBox(
                           height: 25,
                         ),
@@ -398,7 +395,6 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-
                         SwipeableCard()
                       ],
                     ),

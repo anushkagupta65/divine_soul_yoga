@@ -36,7 +36,10 @@ class _ContactUsState extends State<ContactUs> {
       appBar: AppBar(
         title: Text(
           'Contact Us',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400, color:  Color(0xffD45700)),
+          style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.w400,
+              color: Color(0xffD45700)),
         ),
       ),
       body: SingleChildScrollView(
@@ -63,7 +66,8 @@ class _ContactUsState extends State<ContactUs> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top: 40.0, right: 30),
+                            padding:
+                                const EdgeInsets.only(top: 40.0, right: 30),
                             child: Text(
                               "Contact Information",
                               style: TextStyle(
@@ -81,29 +85,34 @@ class _ContactUsState extends State<ContactUs> {
                             child: Image.asset('assets/images/ct1.png'),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 15.0, right: 20),
+                            padding:
+                                const EdgeInsets.only(top: 15.0, right: 20),
                             child: Text(
                               "+91-91154 92700",
                               style: TextStyle(color: Color(0xffFFFFFF)),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 15.0, right: 20),
+                            padding:
+                                const EdgeInsets.only(top: 15.0, right: 20),
                             child: Image.asset('assets/images/ct2.png'),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 15.0, right: 20),
+                            padding:
+                                const EdgeInsets.only(top: 15.0, right: 20),
                             child: Text(
                               'info@divinesoulyoga.com',
                               style: TextStyle(color: Color(0xffFFFFFF)),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 15.0, right: 20),
+                            padding:
+                                const EdgeInsets.only(top: 15.0, right: 20),
                             child: Container(
                               width: MediaQuery.of(context).size.width * 0.50,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   Image.asset('assets/images/sc1.png'),
                                   Image.asset('assets/images/sc2.png'),
@@ -128,7 +137,7 @@ class _ContactUsState extends State<ContactUs> {
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(top: 15),
+                padding: EdgeInsets.all(20),
                 child: Text(
                   'Interested in joining our classes but feeling intimidated? Don’t be. Send us a note!',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
@@ -283,12 +292,14 @@ class _ContactUsState extends State<ContactUs> {
                     },
                     child: Text(
                       'Send Message',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xffD45700),
                       foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),

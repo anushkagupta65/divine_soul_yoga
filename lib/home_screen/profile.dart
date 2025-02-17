@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
@@ -318,16 +319,70 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await _requestPermissions(); // Request necessary permissions
+
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Take a Photo'),
+                onTap: () {
+                  _getImage(ImageSource.camera);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Choose from Gallery'),
+                onTap: () {
+                  _getImage(ImageSource.gallery);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Function to get image from selected source
+  Future<void> _getImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
-        print('Picked Image Path: ${pickedFile.path}');
-        _imageFile = File(pickedFile.path); // Save the file for uploading
-        profile_image = pickedFile.path; // Update the displayed image source
+        debugPrint('Picked Image Path: ${pickedFile.path}');
+        _imageFile = File(pickedFile.path);
+        profile_image = pickedFile.path;
       });
     }
   }
+
+  // Request permissions
+  Future<void> _requestPermissions() async {
+    var status = await Permission.storage.request();
+    var cameraStatus = await Permission.camera.request();
+
+    if (!status.isGranted || !cameraStatus.isGranted) {
+      debugPrint('Permissions denied');
+    }
+  }
+
+  // Future<void> _pickImage() async {
+  //   final pickedFile =
+  //       await ImagePicker().pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       print('Picked Image Path: ${pickedFile.path}');
+  //       _imageFile = File(pickedFile.path); // Save the file for uploading
+  //       profile_image = pickedFile.path; // Update the displayed image source
+  //     });
+  //   }
+  // }
 
   String getFormattedDobForApi() {
     // Parse dobController.text to DateTime assuming it's in dd-MM-yyyy format
