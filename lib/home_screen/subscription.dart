@@ -10,8 +10,9 @@ import '../provider/userprovider.dart';
 import 'home_screen.dart';
 
 class SubscriptionScreen extends StatefulWidget {
+  const SubscriptionScreen({super.key});
   @override
-  _SubscriptionScreenState createState() => _SubscriptionScreenState();
+  State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
@@ -25,7 +26,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   String selectedDescription = '';
   int subid = 0;
   bool isTapped = false;
-
 
   @override
   void initState() {
@@ -59,7 +59,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       body: jsonEncode(body),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
       },
     );
 
@@ -68,7 +69,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       String orderId = responseData['id'];
       openCheckout(orderId);
     } else {
-      print("Error creating Razorpay order: ${response.body}");
+      debugPrint("Error creating Razorpay order: ${response.body}");
     }
   }
 
@@ -89,34 +90,33 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-     bookSubs(
+    bookSubs(
       subscriptionId: int.parse(subsId),
       paymentId: response.paymentId!,
       orderId: response.orderId!,
     );
-     isTapped = false;
+    isTapped = false;
 
-
-
-     // if (response.paymentId != null && response.orderId != null) {
+    // if (response.paymentId != null && response.orderId != null) {
     //    bookSubs(
     //     subscriptionId: int.parse(subsId),
     //     paymentId: response.paymentId!,
     //     orderId: response.orderId!,
     //   );
     // } else {
-    //   print("Payment ID or Order ID is null.");
+    //   debugPrint("Payment ID or Order ID is null.");
     // }
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Payment Successful'),
+        title: const Text('Payment Successful'),
         content: Text('Payment ID: ${response.paymentId}'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen())),
-            child: Text('OK'),
+            onPressed: () => Navigator.push(
+                context, MaterialPageRoute(builder: (context) => HomeScreen())),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -129,12 +129,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Payment Failed'),
+        title: const Text('Payment Failed'),
         content: Text('Error: ${response.message}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -148,7 +148,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('user_id');
-    const String url = 'https://divinesoulyoga.in/api/subscription-purchased-data';
+    const String url =
+        'https://divinesoulyoga.in/api/subscription-purchased-data';
 
     // Format the current date
     String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
@@ -170,21 +171,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       );
 
       if (response.statusCode == 200) {
-        print(response.body);
-        print('Subscription booked successfully.');
+        debugPrint(response.body);
+        debugPrint('Subscription booked successfully.');
       } else {
-        print('Failed to book subscription: ${response.body}');
+        debugPrint('Failed to book subscription: ${response.body}');
       }
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
     }
   }
 
-
   Future<void> fetchSubscriptions() async {
     try {
-      final response =
-      await http.get(Uri.parse('https://divinesoulyoga.in/api/subscription-Data'));
+      final response = await http
+          .get(Uri.parse('https://divinesoulyoga.in/api/subscription-Data'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
@@ -210,86 +210,124 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Subscription', style: TextStyle(color: Color(0xffD45700))),
+        title: const Text('Subscription',
+            style: TextStyle(color: Color(0xffD45700))),
         backgroundColor: Colors.white,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/group1.png'),
-            SizedBox(height: 20,),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: ListView.builder(
-                itemCount: subscriptions.length,
-                physics: NeverScrollableScrollPhysics(), // Prevent internal scrolling
-                shrinkWrap: true, // Allow ListView to take only required space
-                itemBuilder: (context, index) {
-                  final subscription = subscriptions[index];
-                  final isSelected = subscription['id'].toString() == subsId;
-                  return Card(
-                    color: isSelected ? Color(0xffD45700) : Colors.white70,
-                    child: ListTile(
-                      title: Text(
-                        "${subscription['name']} - ${subscription['validity']} months",
-                        style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black),
-                      ),
-                      subtitle: Text(subscription['description'], style: TextStyle(color: isSelected ? Colors.white :Colors.black),),
-                      trailing: profileProvider.profileData!["user"]["subscription_status"] == "0"
-                      ?Text('₹${subscription['amount']}') : Text("Subscribed", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-
-                      selected: isSelected,
-                      onTap: () {
-                        setState(() {
-                          subsId = subscription['id'].toString();
-                          subid = subscription['id'];
-                          amountInPaisa = int.parse(subscription['amount']) * 100;
-                          selectedName = subscription['name'];
-                          selectedDescription = subscription['description'];
-                        });
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset('assets/images/group1.png'),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ListView.builder(
+                      itemCount: subscriptions.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final subscription = subscriptions[index];
+                        final isSelected =
+                            subscription['id'].toString() == subsId;
+                        return Card(
+                          color: isSelected
+                              ? const Color(0xffD45700)
+                              : Colors.white70,
+                          child: ListTile(
+                            title: Text(
+                              "${subscription['name']} - ${subscription['validity']} months",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color:
+                                      isSelected ? Colors.white : Colors.black),
+                            ),
+                            subtitle: Text(
+                              subscription['description'],
+                              style: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            ),
+                            trailing: profileProvider.profileData!["user"]
+                                        ["subscription_status"] ==
+                                    "0"
+                                ? Text(
+                                    '₹${subscription['amount']}',
+                                    style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.black),
+                                  )
+                                : const Text("Subscribed",
+                                    style: TextStyle(
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.bold)),
+                            selected: isSelected,
+                            onTap: () {
+                              setState(() {
+                                if (subsId == subscription['id'].toString()) {
+                                  // If already selected, unselect it
+                                  subsId = "";
+                                  subid = -1;
+                                  amountInPaisa = 0;
+                                  selectedName = "";
+                                  selectedDescription = "";
+                                } else {
+                                  // Otherwise, select the new item
+                                  subsId = subscription['id'].toString();
+                                  subid = subscription['id'];
+                                  amountInPaisa =
+                                      int.parse(subscription['amount']) * 100;
+                                  selectedName = subscription['name'];
+                                  selectedDescription =
+                                      subscription['description'];
+                                }
+                              });
+                            },
+                          ),
+                        );
                       },
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  profileProvider.profileData!["user"]["subscription_status"] ==
+                          "0"
+                      ? Center(
+                          child: ElevatedButton(
+                            onPressed: subsId.isEmpty
+                                ? null
+                                : () {
+                                    isTapped ? null : createRazorpayOrder();
+                                    isTapped = true;
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: subsId.isEmpty
+                                  ? Colors.grey
+                                  : const Color(0xffD45700),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 15),
+                              textStyle: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            child: Text(
+                              'Buy Subscription',
+                              style: TextStyle(
+                                color:
+                                    subsId.isEmpty ? Colors.grey : Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox()
+                ],
               ),
             ),
-
-            SizedBox(height: 50,),
-
-            profileProvider.profileData!["user"]["subscription_status"] == "0"
-            ?
-            Center(
-              child: ElevatedButton(
-                onPressed: subsId.isEmpty
-                    ? null
-                    : () {
-                  isTapped ? null :createRazorpayOrder();
-                   isTapped = true;
-
-                },
-                child: Text(
-                  'Buy Subscription',
-                  style: TextStyle(
-                    color: subsId.isEmpty ? Colors.grey : Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                  subsId.isEmpty ? Colors.grey : Color(0xffD45700),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-                  textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            )
-                : SizedBox()
-            //Center(child: Text("Already Subscribed", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),))
-          ],
-        ),
-      ),
     );
   }
-
 }

@@ -286,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => SubscriptionScreen()),
+                        builder: (context) => const SubscriptionScreen()),
                   );
                 },
               ),
@@ -408,17 +408,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 Row(
                                   children: [
                                     IconButton(
-                                      icon: Icon(Icons.menu),
+                                      icon: const Icon(Icons.menu),
                                       onPressed: () {
                                         _scaffoldKey.currentState?.openDrawer();
                                       },
                                     ),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 10,
                                     ),
                                     profileProvider.isLoading
-                                        ? SizedBox()
+                                        ? const SizedBox()
                                         : Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
@@ -429,7 +431,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                     text: 'Hello, ',
                                                     style: GoogleFonts.gotu(
                                                       color: Colors.black,
-                                                      fontSize: 22,
+                                                      fontSize: 20,
                                                       fontWeight:
                                                           FontWeight.normal,
                                                     ),
@@ -442,7 +444,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                         '',
                                                     style: GoogleFonts.gotu(
                                                       color: Color(0xffD45700),
-                                                      fontSize: 22,
+                                                      fontSize: 20,
                                                       fontWeight:
                                                           FontWeight.normal,
                                                     ),
@@ -452,6 +454,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               Text(
                                                 _getGreeting(),
                                                 textAlign: TextAlign.left,
+                                                style: GoogleFonts.gotu(
+                                                  color: Colors.black,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -460,58 +467,48 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 Container(
                                   child: Row(
                                     children: [
-                                      // Container(
-                                      //     child: Icon(
-                                      //   CupertinoIcons.bell,
-                                      //   size: 28,
-                                      //   color: Color(0xff545454),
-                                      // )),
-                                      SizedBox(width: 16),
-                                      // InkWell(
-                                      //   onTap: _openDrawer,
-
-                                      // ),
-
+                                      const SizedBox(width: 16),
                                       InkWell(
                                         onTap: () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    Profile(index: '1')),
+                                                    const Profile(index: '1')),
                                           );
                                         },
-                                        child: profileProvider.profileData!["user"]
+                                        child: profileProvider
+                                                        .profileData!["user"]
                                                     ["profile_image"] !=
                                                 null
                                             ? CircleAvatar(
                                                 radius: 23.0,
                                                 backgroundImage: (profileProvider
-                                                                .profileData!['user']
+                                                                    .profileData![
+                                                                'user']
                                                             ['profile_image'] !=
                                                         "")
                                                     ? NetworkImage(profileProvider
-                                                            .profileData!['user']
+                                                                .profileData![
+                                                            'user']
                                                         ['profile_image'])
-                                                    : AssetImage(
-                                                        "assets/images/act1.png"))
-                                            : CircleAvatar(
+                                                    : const AssetImage(
+                                                        "assets/images/act1.png"),
+                                              )
+                                            : const CircleAvatar(
                                                 radius: 25,
                                                 backgroundImage: AssetImage(
-                                                    "assets/images/act1.png")),
+                                                    "assets/images/act1.png"),
+                                              ),
                                       )
                                     ],
                                   ),
                                 )
                               ]),
                         ),
-
                         Container(
                           width: MediaQuery.of(context).size.width,
                           child: ClipRRect(
-                            // borderRadius: BorderRadius.only(
-                            //     topLeft: Radius.circular(20),
-                            //     topRight: Radius.circular(20)),
                             child: YoutubePlayer(
                               controller: _videocontroller,
                               showVideoProgressIndicator: true,
@@ -523,212 +520,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        // Padding(
-                        //   padding: const EdgeInsets.all(15.0),
-                        //   child: TextFormField(
-                        //     // controller: _controller,
-                        //     decoration: InputDecoration(
-                        //       isDense: true,
-                        //       prefixIcon: Padding(
-                        //         padding: const EdgeInsets.only(left: 8.0),
-                        //         child: Align(
-                        //           alignment: Alignment.centerLeft,
-                        //           child: Icon(
-                        //             Icons.search,
-                        //             color: Color(0xffD45700),
-                        //             size: 28,
-                        //           ),
-                        //         ),
-                        //       ),
-
-                        //       filled: true, // Enables background color
-                        //       fillColor: Colors.white, // Background color
-                        //       border: OutlineInputBorder(
-                        //         borderRadius:
-                        //             BorderRadius.circular(35), // Rounded corners
-                        //         borderSide: const BorderSide(
-                        //           color:
-                        //               Color.fromARGB(255, 83, 81, 81), // Border color
-                        //           width: 327, // Border width
-                        //         ),
-                        //       ),
-                        //       enabledBorder: OutlineInputBorder(
-                        //         borderRadius: BorderRadius.circular(35),
-                        //         borderSide: const BorderSide(
-                        //           color: Color.fromARGB(
-                        //               255, 124, 122, 122), // Border color when enabled
-                        //         ),
-                        //       ),
-                        //       focusedBorder: OutlineInputBorder(
-                        //         borderRadius: BorderRadius.circular(35),
-                        //         borderSide: const BorderSide(
-                        //           color: Color.fromARGB(
-                        //               255, 120, 117, 117), // Border color when focused
-                        //         ),
-                        //       ),
-                        //       labelStyle: const TextStyle(
-                        //           fontSize: 16), // Customize label text size
-                        //     ),
-                        //     validator: (value) {
-                        //       if (value == null ||
-                        //           value.isEmpty ||
-                        //           value.length > 10 ||
-                        //           value.length < 10) {
-                        //         return 'Please enter some your mobile number';
-                        //       }
-                        //       return null;
-                        //     },
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.all(10),
-                        //   child: Text(
-                        //     'Trending Now',
-                        //     style: TextStyle(
-                        //         fontSize: 18,
-                        //         fontWeight: FontWeight.bold,
-                        //         color: Color(0xff33272A)),
-                        //   ),
-                        // ),
-                        // Container(
-                        //   height: 120, // Set a fixed height for the ListView
-                        // child: ListView.builder(
-                        //   scrollDirection: Axis.horizontal,
-                        //   itemCount: 4, // Total number of items in the slider
-                        //   itemBuilder: (context, index) {
-                        // return Container(
-                        //   width: MediaQuery.of(context).size.width /
-                        //       4.4, // Show 4 items at a time
-                        //   margin: EdgeInsets.symmetric(horizontal: 4),
-                        //   decoration: BoxDecoration(
-                        //     color: Colors.blueAccent,
-                        //     borderRadius: BorderRadius.circular(10),
-                        //   ),
-                        //   child: Center(child: Image.asset("assets/images/card1.png")),
-                        // );
-                        //   },
-                        // ),
-                        // child: Row(
-                        //   children: [
-                        //     Container(
-                        //       width: MediaQuery.of(context).size.width /
-                        //           4.4, // Show 4 items at a time
-                        //       margin: EdgeInsets.symmetric(horizontal: 4),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(10),
-                        //       ),
-                        //       child: Center(
-                        //         child: Stack(children: [
-                        //           Image.asset("assets/images/RC1.png"),
-                        //           Padding(
-                        //             padding: const EdgeInsets.only(top: 2, left: 15),
-                        //             child: Text(
-                        //               'Dummy\nText',
-                        //               style: TextStyle(
-                        //                   fontSize: 10,
-                        //                   fontWeight: FontWeight.bold,
-                        //                   color: Color(0xffffffff)),
-                        //               textAlign: TextAlign.center,
-                        //             ),
-                        //           ),
-                        //           Padding(
-                        //             padding:
-                        //                 const EdgeInsets.only(top: 28.0, left: 6),
-                        //             child: Image.asset("assets/images/RC2.png"),
-                        //           )
-                        //         ]),
-                        //       ),
-                        //     ),
-                        //     Container(
-                        //       width: MediaQuery.of(context).size.width /
-                        //           4.4, // Show 4 items at a time
-                        //       margin: EdgeInsets.symmetric(horizontal: 4),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(10),
-                        //       ),
-                        //       child: Center(
-                        //           child: Stack(children: [
-                        //         Image.asset("assets/images/Rg1.png"),
-                        //         Padding(
-                        //           padding: const EdgeInsets.only(top: 2, left: 15),
-                        //           child: Text(
-                        //             'Dummy\nText',
-                        //             style: TextStyle(
-                        //                 fontSize: 10,
-                        //                 fontWeight: FontWeight.bold,
-                        //                 color: Color(0xff000000)),
-                        //             textAlign: TextAlign.center,
-                        //           ),
-                        //         ),
-                        //         Padding(
-                        //           padding: const EdgeInsets.only(top: 28.0, left: 6),
-                        //           child: Image.asset("assets/images/Rg2.png"),
-                        //         )
-                        //       ])),
-                        //     ),
-                        //     Container(
-                        //       width: MediaQuery.of(context).size.width /
-                        //           4.4, // Show 4 items at a time
-                        //       margin: EdgeInsets.symmetric(horizontal: 4),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(10),
-                        //       ),
-                        //       child: Center(
-                        //           child: Stack(children: [
-                        //         Image.asset("assets/images/Rg1.png"),
-                        //         Padding(
-                        //           padding: const EdgeInsets.only(top: 2.0, left: 15),
-                        //           child: Text(
-                        //             'Dummy\nText',
-                        //             style: TextStyle(
-                        //                 fontSize: 10,
-                        //                 fontWeight: FontWeight.bold,
-                        //                 color: Color(0xff000000)),
-                        //             textAlign: TextAlign.center,
-                        //           ),
-                        //         ),
-                        //         Padding(
-                        //           padding: const EdgeInsets.only(top: 28.0, left: 6),
-                        //           child: Image.asset("assets/images/Rg3.png"),
-                        //         )
-                        //       ])),
-                        //     ),
-                        //     Container(
-                        //       width: MediaQuery.of(context).size.width /
-                        //           4.4, // Show 4 items at a time
-                        //       margin: EdgeInsets.symmetric(horizontal: 4),
-                        //       decoration: BoxDecoration(
-                        //         borderRadius: BorderRadius.circular(10),
-                        //       ),
-                        //       child: Center(
-                        //           child: Stack(children: [
-                        //         Image.asset("assets/images/Rg1.png"),
-                        //         Padding(
-                        //           padding: const EdgeInsets.only(top: 2, left: 15),
-                        //           child: Text(
-                        //             'Dummy\nText',
-                        //             style: TextStyle(
-                        //                 fontSize: 10,
-                        //                 fontWeight: FontWeight.bold,
-                        //                 color: Color(0xff000000)),
-                        //             textAlign: TextAlign.center,
-                        //           ),
-                        //         ),
-                        //         Padding(
-                        //           padding: const EdgeInsets.only(top: 28.0, left: 6),
-                        //           child: Image.asset("assets/images/Rg4.png"),
-                        //         )
-                        //       ])),
-                        //     ),
-                        //   ],
-                        // ),
-                        // ),
-                        SizedBox(
-                          height: 15,
+                        const SizedBox(
+                          height: 20,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 0),
+                        const Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 18, vertical: 0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -736,39 +533,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 'Categories',
                                 textAlign: TextAlign.left,
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              // InkWell(
-                              //   onTap: () {
-                              //     Navigator.push(
-                              //         context,
-                              //         MaterialPageRoute(
-                              //             builder: (context) => SeeAll()));
-                              //   },
-                              //   child: Container(
-                              //     decoration: BoxDecoration(
-                              //         borderRadius:
-                              //             BorderRadius.all(Radius.circular(30)),
-                              //         border: Border.all(
-                              //             width: 2,
-                              //             color: const Color.fromARGB(
-                              //                 255, 221, 99, 37))),
-                              //     child: Padding(
-                              //       padding: const EdgeInsets.symmetric(
-                              //           horizontal: 8, vertical: 0),
-                              //       child: Text('See all'),
-                              //     ),
-                              //   ),
-                              // ),
-                              // Padding(padding: const EdgeInsets.only(top: 10, left: 10))
                             ],
                           ),
                         ),
-                        // Expanded(child: Programtab()),
                         Padding(
-                          padding: const EdgeInsets.all(20.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -782,10 +556,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   width: MediaQuery.of(context).size.width / 5,
                                   decoration: BoxDecoration(
                                       color: activeTabs == 1
-                                          ? Color(0xffD45700)
-                                          : Color(0xffffffff),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(30)),
+                                          ? const Color(0xffD45700)
+                                          : const Color(0xffffffff),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(30)),
                                       border: Border.all(
                                           width: 2,
                                           color: const Color.fromARGB(
@@ -815,10 +589,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   width: MediaQuery.of(context).size.width / 5,
                                   decoration: BoxDecoration(
                                       color: activeTabs == 2
-                                          ? Color(0xffD45700)
-                                          : Color(0xffffffff),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(30)),
+                                          ? const Color(0xffD45700)
+                                          : const Color(0xffffffff),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(30)),
                                       border: Border.all(
                                           width: 2,
                                           color: const Color.fromARGB(
@@ -848,10 +622,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   width: MediaQuery.of(context).size.width / 5,
                                   decoration: BoxDecoration(
                                       color: activeTabs == 3
-                                          ? Color(0xffD45700)
-                                          : Color(0xffffffff),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(30)),
+                                          ? const Color(0xffD45700)
+                                          : const Color(0xffffffff),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(30)),
                                       border: Border.all(
                                           width: 2,
                                           color: const Color.fromARGB(
@@ -881,10 +655,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   width: MediaQuery.of(context).size.width / 5,
                                   decoration: BoxDecoration(
                                       color: activeTabs == 4
-                                          ? Color(0xffD45700)
-                                          : Color(0xffffffff),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(30)),
+                                          ? const Color(0xffD45700)
+                                          : const Color(0xffffffff),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(30)),
                                       border: Border.all(
                                           width: 2,
                                           color: const Color.fromARGB(
@@ -916,12 +690,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             .toString(),
                       ),
                     if (activeTabs == 3) const Studio(),
-                    if (activeTabs == 4) Gallery(),
-                    // if (activeTabs == 5) const Programtab(),
-                    // if (activeTabs == 6)  Events(userId: profileProvider.profileData!['user']['id']
-                    //     .toString(),),
-                    // if (activeTabs == 7) const Studio(),
-                    // if (activeTabs == 8) Gallery(),
+                    if (activeTabs == 4) const Gallery(),
                   ],
                 ),
               ),
@@ -986,7 +755,7 @@ class _SwipeableCardState extends State<SwipeableCard> {
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.5,
           child: testimonialsList.isEmpty
-              ? Center(child: Text("No testimonials available"))
+              ? const Center(child: Text("No testimonials available"))
               : PageView.builder(
                   controller: _controller,
                   itemCount: testimonialsList.length,
@@ -1013,22 +782,17 @@ class _SwipeableCardState extends State<SwipeableCard> {
                                           height: MediaQuery.of(context)
                                                   .size
                                                   .height *
-                                              0.35, // Ensure a fixed height
-
-                                          child: SingleChildScrollView(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Center(
-                                              child: Text(
-                                                test.detail ??
-                                                    "No detail available",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w300,
-                                                  color: Color(0xff666666),
-                                                ),
-                                                textAlign: TextAlign.center,
+                                              0.35,
+                                          child: Center(
+                                            child: Text(
+                                              test.detail ??
+                                                  "No detail available",
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w300,
+                                                color: const Color(0xff666666),
                                               ),
+                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ),
