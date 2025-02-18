@@ -2,13 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:divine_soul_yoga/home_screen/add_event_booking_info.dart';
 import 'package:divine_soul_yoga/models/eventmodel.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../api_service/apiservice.dart';
@@ -18,7 +16,7 @@ class EventDetails extends StatefulWidget {
   const EventDetails({super.key, required this.eventData});
 
   @override
-  _EventDetailsState createState() => _EventDetailsState();
+  State<EventDetails> createState() => _EventDetailsState();
 }
 
 class _EventDetailsState extends State<EventDetails> {
@@ -32,12 +30,14 @@ class _EventDetailsState extends State<EventDetails> {
     super.initState();
     amountInPaisa = (int.parse(widget.eventData.amount) * 100);
     // Initialize the remaining time by calculating the difference from now
-    _remainingTime = DateTime.parse(widget.eventData.startDatetime).difference(DateTime.now());
+    _remainingTime = DateTime.parse(widget.eventData.startDatetime)
+        .difference(DateTime.now());
 
     // Update the remaining time every second
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _remainingTime = DateTime.parse(widget.eventData.startDatetime).difference(DateTime.now());
+        _remainingTime = DateTime.parse(widget.eventData.startDatetime)
+            .difference(DateTime.now());
       });
     });
 
@@ -46,7 +46,6 @@ class _EventDetailsState extends State<EventDetails> {
     // Setting up event handlers
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    // _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
   @override
@@ -59,9 +58,7 @@ class _EventDetailsState extends State<EventDetails> {
     super.dispose();
   }
 
-
   Future<void> createRazorpayOrder() async {
-
     String keyId = "rzp_test_t9nKkE2yOuYEkA";
     String keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
 
@@ -77,7 +74,8 @@ class _EventDetailsState extends State<EventDetails> {
       body: jsonEncode(body), // Convert body to JSON
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}' // Basic Auth header
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}' // Basic Auth header
       },
     );
 
@@ -88,31 +86,19 @@ class _EventDetailsState extends State<EventDetails> {
       String orderId = responseData['id'];
 
       openCheckout(orderId);
-
-    }
-    else{
+    } else {
       print("Something went wrong while creating order");
     }
-
   }
-
-
-
 
   void openCheckout(String orderid) {
     var options = {
       'key': 'rzp_test_t9nKkE2yOuYEkA', // Replace with your Razorpay key
-      'amount': amountInPaisa * 100 , // Amount in smallest currency unit (e.g., 50000 = ₹500.00)
+      'amount': amountInPaisa *
+          100, // Amount in smallest currency unit (e.g., 50000 = ₹500.00)
       'name': widget.eventData.title,
       'description': widget.eventData.title,
-      'order_id' : orderid,
-      // 'prefill': {
-      //   'contact': '9794547665', // User's phone number
-      //   'email': 'user@example.com', // User's email
-      // },
-      // 'theme': {
-      //   'color': '#F37254', // Theme color for the Razorpay UI
-      // },
+      'order_id': orderid,
     };
 
     try {
@@ -122,25 +108,25 @@ class _EventDetailsState extends State<EventDetails> {
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response)  {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Navigator.pop(context);
     // Do something when payment succeeds
-    ApiService().bookEvent(eventId: widget.eventData.id.toString(), amount: widget.eventData.amount, orderId: response.orderId.toString(), paymentId: response.paymentId.toString());
-    //SharedPreferences prefs = await SharedPreferences.getInstance();
-    //ApiService().eventData(userId);
-
-
-
+    ApiService().bookEvent(
+      eventId: widget.eventData.id.toString(),
+      amount: widget.eventData.amount,
+      orderId: response.orderId.toString(),
+      paymentId: response.paymentId.toString(),
+    );
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Payment Successful'),
+        title: const Text('Payment Successful'),
         content: Text('Payment ID: ${response.paymentId}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -152,71 +138,56 @@ class _EventDetailsState extends State<EventDetails> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Payment Failed'),
+        title: const Text('Payment Failed'),
         content: Text('Error: ${response.message}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
     );
   }
 
-  // void _handleExternalWallet(ExternalWalletResponse response) {
-  //   // Handle external wallet payment
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text('External Wallet Selected'),
-  //       content: Text('Wallet Name: ${response.walletName}'),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           child: Text('OK'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   String formatDate(String datetime) {
     final parsedDate = DateTime.parse(datetime); // Parse string to DateTime
-    return DateFormat('MMM dd yyyy').format(parsedDate); // Format to "Jan 11 2024"
+    return DateFormat('MMM dd yyyy')
+        .format(parsedDate); // Format to "Jan 11 2024"
   }
 
   String formatTime(String datetime) {
     final parsedDate = DateTime.parse(datetime); // Parse string to DateTime
-    return DateFormat('hh:mm a').format(parsedDate); // Format to time (e.g., 01:02 AM)
+    return DateFormat('hh:mm a')
+        .format(parsedDate); // Format to time (e.g., 01:02 AM)
   }
 
-  void bookingforfree(){
+  void bookingforfree() {
     Navigator.pop(context);
-    var uuid = Uuid().v4();
+    var uuid = const Uuid().v4();
 
-    ApiService().bookEvent(eventId: widget.eventData.id.toString(), amount: widget.eventData.amount, orderId: uuid, paymentId: uuid);
+    ApiService().bookEvent(
+        eventId: widget.eventData.id.toString(),
+        amount: widget.eventData.amount,
+        orderId: uuid,
+        paymentId: uuid);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Payment Successful'),
-        content: Text('Event Booked'),
+        title: const Text('Payment Successful'),
+        content: const Text('Event Booked'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
     );
   }
 
-
-
-
-
-
-  void showPaymentConfirmationDialog(BuildContext context, String eventName, String trainerName, String amount) {
+  void showPaymentConfirmationDialog(BuildContext context, String eventName,
+      String trainerName, String amount) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -224,7 +195,7 @@ class _EventDetailsState extends State<EventDetails> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
-          title: Text(
+          title: const Text(
             'Payment Confirmation',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
@@ -232,31 +203,31 @@ class _EventDetailsState extends State<EventDetails> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Event Name:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               Text(
                 eventName,
-                style: TextStyle(fontSize: 16.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
-              SizedBox(height: 8.0),
-              Text(
+              const SizedBox(height: 8.0),
+              const Text(
                 'Trainer Name:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               Text(
                 trainerName,
-                style: TextStyle(fontSize: 16.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
-              SizedBox(height: 8.0),
-              Text(
+              const SizedBox(height: 8.0),
+              const Text(
                 'Amount:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               Text(
-                'Rs. ${amount}',
-                style: TextStyle(fontSize: 16.0, color: Colors.green),
+                'Rs. $amount',
+                style: const TextStyle(fontSize: 16.0, color: Colors.green),
               ),
             ],
           ),
@@ -265,28 +236,25 @@ class _EventDetailsState extends State<EventDetails> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-
                 // Proceed with the payment action
                 widget.eventData.amount != "0"
-               ? createRazorpayOrder()             //Navigator.of(context).pop(); // Close dialog
-                : bookingforfree();
-
-
-
+                    ? createRazorpayOrder() //Navigator.of(context).pop(); // Close dialog
+                    : bookingforfree();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xffD45700),
+                backgroundColor: const Color(0xffD45700),
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
-              child: Text('Confirm Payment'),
+              child: const Text('Confirm Payment'),
             ),
           ],
         );
@@ -294,12 +262,9 @@ class _EventDetailsState extends State<EventDetails> {
     );
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
-    String countdown = _formatDuration(_remainingTime);
+    // String countdown = _formatDuration(_remainingTime);
 
     return Scaffold(
       appBar: AppBar(
@@ -316,62 +281,66 @@ class _EventDetailsState extends State<EventDetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              color: Color(0xffD45700),
+              color: const Color(0xffD45700),
               height: MediaQuery.of(context).size.height * 0.25,
               width: double.infinity,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(widget.eventData.title, style: TextStyle(fontSize: 18, color: Colors.white)),
-                  SizedBox(height: 10),
-                  Text("${formatDate(widget.eventData.startDatetime)} to ${formatDate(widget.eventData.endDatetime)}", style: TextStyle(fontSize: 12, color: Colors.white)),
-                  SizedBox(height: 10),
-                  Text("${formatTime(widget.eventData.startDatetime)} to ${formatTime(widget.eventData.endDatetime)}", style: TextStyle(fontSize: 12, color: Colors.white)),
-                  SizedBox(height: 10),
-                  // Text(widget.eventData.startDatetime, style: TextStyle(fontSize: 18, color: Colors.white)),
-                  // SizedBox(height: 10),
-                  //Text("$countdown", style: TextStyle(fontSize: 18, color: Colors.white)),
+                  Text(
+                    widget.eventData.title,
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "${formatDate(widget.eventData.startDatetime)} to ${formatDate(widget.eventData.endDatetime)}",
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "${formatTime(widget.eventData.startDatetime)} to ${formatTime(widget.eventData.endDatetime)}",
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
                   buildCountdown(_remainingTime),
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                  child: Image.network('https://divinesoulyoga.in/${widget.eventData.image}')),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                      'https://divinesoulyoga.in/${widget.eventData.image}')),
             ),
-
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
-
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Html(data: widget.eventData.description),
             ),
-
-            SizedBox(height: 20,),
-
+            const SizedBox(
+              height: 20,
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start
-                ,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                Html(data :'Trainer: ${widget.eventData.trainer}'),
-                Html(data: 'Joining Fee: ${widget.eventData.amount}'),
-                Html(data: 'Venue: ${widget.eventData.location}'),
-                Html(data:'Contact Number: ${widget.eventData.contactNumber}'),
-              ],),
+                  Html(data: 'Trainer: ${widget.eventData.trainer}'),
+                  Html(data: 'Joining Fee: ${widget.eventData.amount}'),
+                  Html(data: 'Venue: ${widget.eventData.location}'),
+                  Html(
+                      data:
+                          'Contact Number: ${widget.eventData.contactNumber}'),
+                ],
+              ),
             ),
-
-            SizedBox(height: 20,),
-
-
-
+            const SizedBox(
+              height: 20,
+            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: SizedBox(
@@ -380,33 +349,25 @@ class _EventDetailsState extends State<EventDetails> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xffD45700),
                     foregroundColor: const Color(0xffFFFFFF),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 5),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   onPressed: () {
-                    // Handle "Attend" button action here
-                    //openCheckout();
-                    
-                    // widget.eventData.paid != true
-                    // ? showPaymentConfirmationDialog(context, widget.eventData.title, widget.eventData.trainer, widget.eventData.amount)
-                    // // Navigator.pop(context);
-                    // : null;
                     widget.eventData.paid != true
-                    ?Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddEventBookingInfo(eventData: widget.eventData,)
-                      ),
-                    )
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddEventBookingInfo(
+                                      eventData: widget.eventData,
+                                    )),
+                          )
                         : null;
                   },
                   child: Text(
-                    widget.eventData.paid != true
-                    ?'Book Event'
-                    : "Booked",
+                    widget.eventData.paid != true ? 'Book Event' : "Booked",
                     style: const TextStyle(fontSize: 18),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -415,7 +376,6 @@ class _EventDetailsState extends State<EventDetails> {
                 ),
               ),
             )
-
           ],
         ),
       ),
@@ -427,16 +387,18 @@ class _EventDetailsState extends State<EventDetails> {
       return "Event Expired";
     }
     String days = duration.inDays > 0 ? "${duration.inDays}d " : "";
-    String hours = (duration.inHours % 24) > 0 ? "${(duration.inHours % 24)}h " : "";
-    String minutes = (duration.inMinutes % 60) > 0 ? "${(duration.inMinutes % 60)}m " : "";
-    String seconds = (duration.inSeconds % 60) > 0 ? "${(duration.inSeconds % 60)}s" : "";
+    String hours =
+        (duration.inHours % 24) > 0 ? "${(duration.inHours % 24)}h " : "";
+    String minutes =
+        (duration.inMinutes % 60) > 0 ? "${(duration.inMinutes % 60)}m " : "";
+    String seconds =
+        (duration.inSeconds % 60) > 0 ? "${(duration.inSeconds % 60)}s" : "";
     return "$days$hours$minutes$seconds";
   }
 
-
   Widget buildCountdown(Duration duration) {
     if (duration.isNegative) {
-      return Text(
+      return const Text(
         "Event Expired",
         style: TextStyle(fontSize: 18, color: Colors.white),
       );
@@ -468,7 +430,7 @@ class _EventDetailsState extends State<EventDetails> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black26,
                       blurRadius: 4,
@@ -478,17 +440,17 @@ class _EventDetailsState extends State<EventDetails> {
                 ),
                 child: Text(
                   item['value']!,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Color(0xffD45700),
                   ),
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 item['label']!,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.white,
                 ),
@@ -499,5 +461,4 @@ class _EventDetailsState extends State<EventDetails> {
       }).toList(),
     );
   }
-
 }

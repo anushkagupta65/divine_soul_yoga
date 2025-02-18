@@ -29,6 +29,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
   int programId = 0; // To control audio sequence
   bool isTapped = false;
   late Future<CourseResponse> futureCourses;
+  Set<int> completedAudios = {};
 
   Future<CourseResponse> fetchCourses() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -58,7 +59,6 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
   }
 
   Future<void> completeCourse(int courseId, int programId) async {
-    //debugPrint(widget.type);
     // Define the API endpoint
     const String url = "https://divinesoulyoga.in/api/complete-course";
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -128,6 +128,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
     // Listen to player state changes
     _audioPlayer.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
+        completedAudios.add(programId); // Mark track as completed
         completeCourse(programId, int.parse(widget.courseId));
         setState(() {
           _currentlyPlayingIndex = null;
@@ -160,6 +161,35 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
         debugPrint('Error playing audio: $e');
       }
     }
+  }
+
+  void _handleTileTap(int index, Course course, List<Course> courses) {
+    if (!course.paid) {
+      _showDialog("To access this audio, you need to purchase the course.");
+    } else if (course.paid && !course.playable) {
+      _showDialog("Please finish the previous audio before accessing this.");
+    } else {
+      programId = course.id;
+      _playTrack(index, course.audioPath);
+    }
+  }
+
+  void _showDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Access Denied"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -214,6 +244,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                       ),
                       child: Card(
                         child: ListTile(
+                            onTap: () => _handleTileTap(index, course, courses),
                             leading: Text(
                               course.audioTime,
                               style: const TextStyle(fontSize: 16),

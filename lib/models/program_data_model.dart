@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 class ProgramResponse {
   final String message;
   final List<Program> data;
@@ -57,7 +55,6 @@ class Program {
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       paid: json['paid'] ?? false,
-     // courses: (json['courses'] as List).map((e) => Course.fromJson(e)).toList(),
     );
   }
 
@@ -71,64 +68,10 @@ class Program {
       'amount': amount,
       'created_at': createdAt,
       'updated_at': updatedAt,
-      'paid' : paid,
-      //'courses': courses.map((e) => e.toJson()).toList(),
+      'paid': paid,
     };
   }
 }
-
-// class Course {
-//   final int id;
-//   final int programId;
-//   final String day;
-//   final String audioPath;
-//   final String audioName;
-//   final String audioTime;
-//   final String createdAt;
-//   final String updatedAt;
-//   final bool completed;
-//
-//   Course({
-//     required this.id,
-//     required this.programId,
-//     required this.day,
-//     required this.audioPath,
-//     required this.audioName,
-//     required this.audioTime,
-//     required this.createdAt,
-//     required this.updatedAt,
-//     required this.completed,
-//   });
-//
-//   factory Course.fromJson(Map<String, dynamic> json) {
-//     return Course(
-//       id: int.tryParse(json['id'].toString()) ?? 0,
-//       programId: int.tryParse(json['program_id'].toString()) ?? 0,
-//       day: json['day'] ?? '',
-//       audioPath: json['audio_path'] ?? '',
-//       audioName: json['audio_name'] ?? '',
-//       audioTime: json['audio_time'] ?? '',
-//       createdAt: json['created_at'] ?? '',
-//       updatedAt: json['updated_at'] ?? '',
-//       completed: json['completed'] == true || json['completed'] == 'true', // Convert to bool
-//     );
-//   }
-//
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'id': id,
-//       'program_id': programId,
-//       'day': day,
-//       'audio_path': audioPath,
-//       'audio_time': audioTime,
-//       'created_at': createdAt,
-//       'updated_at': updatedAt,
-//       'completed': completed,
-//     };
-//   }
-// }
-
-
 
 class CourseResponse {
   final String message;
