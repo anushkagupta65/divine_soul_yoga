@@ -27,16 +27,17 @@ class _AboutUsState extends State<AboutUs> {
     });
   }
 
+  @override
   Widget build(BuildContext context) {
-    return (Scaffold(
+    return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'About',
           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
         ),
       ),
       body: isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : SingleChildScrollView(
@@ -54,7 +55,7 @@ class _AboutUsState extends State<AboutUs> {
                   ),
                   Container(
                     transform: Matrix4.translationValues(0.0, -50.0, 0.0),
-                    child: CircleAvatar(
+                    child: const CircleAvatar(
                       radius: 50.0,
                       backgroundImage: AssetImage('assets/images/impro1.png'),
                     ),
@@ -62,26 +63,26 @@ class _AboutUsState extends State<AboutUs> {
                   Container(
                     child: Text(
                       aboutData![0]["title"],
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w300,
-                          color: const Color.fromRGBO(253, 96, 5, 1)),
+                          color: Color.fromRGBO(253, 96, 5, 1)),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Html(data: aboutData![0]["description"]),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 30,
                   )
                 ],
               ),
             ),
-    ));
+    );
   }
 }

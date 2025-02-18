@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:divine_soul_yoga/home_screen/attendedEvent.dart';
+import 'package:divine_soul_yoga/home_screen/attended_event.dart';
 import 'package:divine_soul_yoga/home_screen/gallery.dart';
 import 'package:divine_soul_yoga/home_screen/our_team.dart';
 import 'package:divine_soul_yoga/models/blogmodel.dart';

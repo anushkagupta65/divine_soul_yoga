@@ -2,7 +2,7 @@
 // import 'dart:ui_web';
 import 'package:divine_soul_yoga/api_service/apiservice.dart';
 import 'package:divine_soul_yoga/home_screen/about_us.dart';
-import 'package:divine_soul_yoga/home_screen/attendedEvent.dart';
+import 'package:divine_soul_yoga/home_screen/attended_event.dart';
 import 'package:divine_soul_yoga/home_screen/blog.dart';
 import 'package:divine_soul_yoga/home_screen/contact_us.dart';
 import 'package:divine_soul_yoga/home_screen/events.dart';
@@ -11,22 +11,19 @@ import 'package:divine_soul_yoga/home_screen/gallery.dart';
 import 'package:divine_soul_yoga/home_screen/our_team.dart';
 import 'package:divine_soul_yoga/home_screen/profile.dart';
 import 'package:divine_soul_yoga/home_screen/program_tab.dart';
-import 'package:divine_soul_yoga/home_screen/see_all.dart';
 import 'package:divine_soul_yoga/home_screen/studio.dart';
 import 'package:divine_soul_yoga/home_screen/subscription.dart';
 import 'package:divine_soul_yoga/login/login.dart';
 import 'package:divine_soul_yoga/models/testimonialsmodel.dart';
-import 'package:divine_soul_yoga/models/usermodel.dart';
 import 'package:divine_soul_yoga/provider/userprovider.dart';
 import 'package:divine_soul_yoga/utils/logout_dialog.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'dart:developer';
 
@@ -35,8 +32,8 @@ class HomeScreen extends StatefulWidget {
 
   const HomeScreen({
     this.userId,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -47,10 +44,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isLoading = true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  ApiService apiService = new ApiService();
-  bool _isExpanded = false;
+  ApiService apiService = ApiService();
 
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   late YoutubePlayerController _controller;
   late PageController _pageViewController;
   late TabController _tabController;
@@ -63,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     _controller = YoutubePlayerController(
       initialVideoId: 'RYMAkz8WUUI',
-      flags: YoutubePlayerFlags(
+      flags: const YoutubePlayerFlags(
         hideThumbnail: false,
         autoPlay: false,
         mute: false,
@@ -72,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // Replace the below videoId with the actual YouTube video ID
     _videocontroller = YoutubePlayerController(
       initialVideoId: 'RYMAkz8WUUI',
-      flags: YoutubePlayerFlags(
+      flags: const YoutubePlayerFlags(
         hideThumbnail: false,
         autoPlay: false,
         mute: false,
@@ -209,11 +205,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               children: [
                                 InkWell(
                                   onTap: _closeDrawer,
-                                  child: Icon(
-                                    Icons.arrow_back, // The back arrow icon (←)
-                                    size: 30.0, // Adjust the size if needed
-                                    color: Color(
-                                        0xffffffff), // You can change the color
+                                  child: const Icon(
+                                    Icons.arrow_back,
+                                    size: 30.0,
+                                    color: Color(0xffffffff),
                                   ),
                                 ),
                                 InkWell(
@@ -222,8 +217,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              Profile(index: "1")),
+                                        builder: (context) =>
+                                            const Profile(index: "1"),
+                                      ),
                                     );
                                   },
                                   child: Image.asset(
@@ -245,19 +241,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         ? NetworkImage(
                                             profileProvider.profileData!['user']
                                                 ['profile_image'])
-                                        : AssetImage("assets/images/act1.png"))
-                                : CircleAvatar(
+                                        : const AssetImage(
+                                            "assets/images/act1.png"))
+                                : const CircleAvatar(
                                     radius: 50.0,
                                     backgroundImage:
                                         AssetImage("assets/images/act1.png")),
-                            SizedBox(
+                            const SizedBox(
                               width: 40,
                               height: 10,
                             ),
                             Text(
                               profileProvider.profileData!["user"]["name"] ??
                                   '',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 28,
                                 fontWeight: FontWeight.w400,
@@ -268,22 +265,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
               ListTile(
-                leading: Image(
+                leading: const Image(
                   image: AssetImage("assets/images/smb1.png"),
                   color: Color(0xffD45700),
                 ),
-                title: Text('Home'),
+                title: const Text('Home'),
                 onTap: () {
                   // Navigate to Home
                   Navigator.pop(context);
                 },
               ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.monetization_on_outlined,
                   color: Color(0xffD45700),
                 ),
-                title: Text('Subscription'),
+                title: const Text('Subscription'),
                 onTap: () {
                   // Navigate to Home
                   Navigator.push(
@@ -294,11 +291,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.event_available,
                   color: Color(0xffD45700),
                 ),
-                title: Text('Attended Events'),
+                title: const Text('Attended Events'),
                 onTap: () {
                   // Navigate to Home
                   Navigator.push(
@@ -312,38 +309,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 },
               ),
               ListTile(
-                leading: Image(
+                leading: const Image(
                   image: AssetImage(
                     "assets/images/smb2.png",
                   ),
                   color: Color(0xffD45700),
                 ),
-                title: Text('Our Team'),
+                title: const Text('Our Team'),
                 onTap: () {
                   _closeDrawer();
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => OurTeam()),
+                    MaterialPageRoute(builder: (context) => const OurTeam()),
                   );
 
                   // Navigate to Settings
                 },
               ),
               ListTile(
-                  leading: Image(
+                  leading: const Image(
                     image: AssetImage("assets/images/smb3.png"),
                     color: Color(0xffD45700),
                   ),
-                  title: Text('Blog '),
+                  title: const Text('Blog '),
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Blog()),
+                      MaterialPageRoute(builder: (context) => const Blog()),
                     );
                   }),
               ListTile(
-                  leading: Image(
-                    image: AssetImage("assets/images/smb4.png"),
+                  leading: const Image(
+                    image: const AssetImage("assets/images/smb4.png"),
                     color: Color(0xffD45700),
                   ),
                   title: Text('Contact Us'),

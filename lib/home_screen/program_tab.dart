@@ -350,23 +350,22 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                 child: Card(
                   elevation: 3,
                   child: Container(
-                    // padding: const EdgeInsets.only(
-                    // top: 10, right: 20, left: 20, bottom: 20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffffffff),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    width: MediaQuery.of(context).size.width,
                     child: Column(
                       children: [
-                        Container(
+                        SizedBox(
                           width: MediaQuery.of(context).size.width,
-                          child: ClipRRect(
+                          child: const ClipRRect(
                             borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20)),
-                            // child: Image(
-                            //   image: AssetImage("assets/images/img1.png"),
-                            //   fit: BoxFit.cover,
-                            //   // width: MediaQuery.of(context).size.width,
-                            // ),
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
                             child: Padding(
-                              padding: const EdgeInsets.all(30.0),
+                              padding: EdgeInsets.all(30.0),
                               child: Text(
                                 "Testimonials",
                                 style: TextStyle(
@@ -383,26 +382,16 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                           child: Container(
                             // color: Colors.black,
                             alignment: Alignment.centerLeft,
-                            child: Image(
+                            child: const Image(
                               image: AssetImage(
                                 "assets/images/its.png",
                               ),
-                              // style: TextStyle(
-                              //   fontSize: 20,
-                              //   fontWeight: FontWeight.w400,
-                              //   color: Color(0xff000000),
-                              // ),
                             ),
                           ),
                         ),
                         SwipeableCard()
                       ],
                     ),
-                    decoration: BoxDecoration(
-                      color: Color(0xffffffff),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    width: MediaQuery.of(context).size.width,
                   ),
                 ),
               ),

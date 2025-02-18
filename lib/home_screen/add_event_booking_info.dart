@@ -13,7 +13,7 @@ class AddEventBookingInfo extends StatefulWidget {
   const AddEventBookingInfo({super.key, required this.eventData});
 
   @override
-  _AddEventBookingInfoState createState() => _AddEventBookingInfoState();
+  State<AddEventBookingInfo> createState() => _AddEventBookingInfoState();
 }
 
 class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
@@ -38,9 +38,8 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
   final List<Map<String, String>> _personList = [];
   bool isTapped = false;
 
-
-
-  void showPaymentConfirmationDialog(BuildContext context, String eventName, String trainerName, int amount) {
+  void showPaymentConfirmationDialog(
+      BuildContext context, String eventName, String trainerName, int amount) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -48,7 +47,7 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
-          title: Text(
+          title: const Text(
             'Payment Confirmation',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
@@ -56,31 +55,31 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Event Name:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               Text(
                 eventName,
-                style: TextStyle(fontSize: 16.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
-              SizedBox(height: 8.0),
-              Text(
+              const SizedBox(height: 8.0),
+              const Text(
                 'Trainer Name:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               Text(
                 trainerName,
-                style: TextStyle(fontSize: 16.0),
+                style: const TextStyle(fontSize: 16.0),
               ),
-              SizedBox(height: 8.0),
-              Text(
+              const SizedBox(height: 8.0),
+              const Text(
                 'Amount:',
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               Text(
-                'Rs. ${amount}',
-                style: TextStyle(fontSize: 16.0, color: Colors.green),
+                'Rs. $amount',
+                style: const TextStyle(fontSize: 16.0, color: Colors.green),
               ),
             ],
           ),
@@ -89,31 +88,23 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
-
-                // Proceed with the payment action
-                // widget.eventData.amount != "0"
-                //     ?
-
-                isTapped ? null : createRazorpayOrder() ;           //Navigator.of(context).pop(); // Close dialog
-                 //   : bookingforfree();
+                isTapped ? null : createRazorpayOrder();
                 isTapped = true;
-
-
-
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xffD45700),
+                backgroundColor: const Color(0xffD45700),
                 foregroundColor: Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
-              child: Text('Confirm Payment'),
+              child: const Text('Confirm Payment'),
             ),
           ],
         );
@@ -121,14 +112,12 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
     );
   }
 
-
   Future<void> createRazorpayOrder() async {
-
     String keyId = "rzp_test_t9nKkE2yOuYEkA";
     String keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
 
     Map<String, dynamic> body = {
-      "amount": amountInPaisa *100,
+      "amount": amountInPaisa * 100,
       "currency": "INR",
       "receipt": "receipt#1",
       "payment_capture": 1
@@ -139,42 +128,30 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
       body: jsonEncode(body), // Convert body to JSON
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}' // Basic Auth header
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}' // Basic Auth header
       },
     );
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      print("Response Data: $responseData");
+      debugPrint("Response Data: $responseData");
       // Extract the order_id from the response
       String orderId = responseData['id'];
 
       openCheckout(orderId);
-
+    } else {
+      debugPrint("Something went wrong while creating order");
     }
-    else{
-      print("Something went wrong while creating order");
-    }
-
   }
-
-
-
 
   void openCheckout(String orderid) {
     var options = {
       'key': 'rzp_test_t9nKkE2yOuYEkA', // Replace with your Razorpay key
-      'amount': amountInPaisa * 100 , // Amount in smallest currency unit (e.g., 50000 = ₹500.00)
+      'amount': amountInPaisa * 100,
       'name': widget.eventData.title,
       'description': widget.eventData.title,
-      'order_id' : orderid,
-      // 'prefill': {
-      //   'contact': '9794547665', // User's phone number
-      //   'email': 'user@example.com', // User's email
-      // },
-      // 'theme': {
-      //   'color': '#F37254', // Theme color for the Razorpay UI
-      // },
+      'order_id': orderid,
     };
 
     try {
@@ -184,24 +161,28 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response)  {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Navigator.pop(context);
     // Do something when payment succeeds
-    createEventAttendee(orderId: response.orderId.toString(), payment_id: response.paymentId.toString());
+    createEventAttendee(
+        orderId: response.orderId.toString(),
+        paymentID: response.paymentId.toString());
     isTapped = false;
-
-
-
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Payment Successful'),
+        title: const Text('Payment Successful'),
         content: Text('Payment ID: ${response.paymentId}'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen())),
-            child: Text('OK'),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            ),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -215,33 +196,28 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Payment Failed'),
+        title: const Text('Payment Failed'),
         content: Text('Error: ${response.message}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
     );
   }
 
-
-
-  Future<void> createEventAttendee(
-  {
+  Future<void> createEventAttendee({
     required String orderId,
-     required String payment_id,
-    //required List<Map<String, String>> attendees,
-  }
-  ) async {
-    print("Amount rs: $amountInPaisa");
+    required String paymentID,
+  }) async {
+    debugPrint("Amount rs: $amountInPaisa");
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userId = prefs.getString('user_id');
     const String url = "https://divinesoulyoga.in/api/event-attendee";
-    print(_personList);
+    debugPrint('$_personList');
 
     // Prepare the request body
     final Map<String, dynamic> body = {
@@ -249,7 +225,7 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
       "event_id": widget.eventData.id,
       "amount": amountInPaisa,
       "order_id": orderId,
-      "payment_id": payment_id,
+      "payment_id": paymentID,
       "attendees": _personList,
     };
 
@@ -257,24 +233,21 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
       // Make the POST request
       final response = await http.post(
         Uri.parse(url),
-        // headers: {
-        //   "Content-Type": "application/json",
-        // },
         body: jsonEncode(body),
       );
 
       // Handle the response
       if (response.statusCode == 200) {
         // Success
-        print("Event attendee created successfully: ${response.body}");
+        debugPrint("Event attendee created successfully: ${response.body}");
       } else {
         // Error
-        print("Failed to create event attendee: ${response.statusCode}");
-        print("Response: ${response.body}");
+        debugPrint("Failed to create event attendee: ${response.statusCode}");
+        debugPrint("Response: ${response.body}");
       }
     } catch (e) {
       // Exception handling
-      print("Error occurred: $e");
+      debugPrint("Error occurred: $e");
     }
   }
 
@@ -299,16 +272,13 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Person successfully added!')),
+        const SnackBar(content: Text('Person successfully added!')),
       );
     }
   }
 
-
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _razorpay = Razorpay();
 
@@ -319,17 +289,18 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     _razorpay.clear(); // Clear all event handlers
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Person to Event', style: TextStyle(color: Color(0xffD45700)),),
+        title: const Text(
+          'Add Person to Event',
+          style: TextStyle(color: Color(0xffD45700)),
+        ),
         backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -342,7 +313,7 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Add Person Details',
                       style: TextStyle(
                         fontSize: 20,
@@ -350,10 +321,10 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
                         color: Color(0xffD45700),
                       ),
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _nameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Name',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.person),
@@ -365,10 +336,10 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: _ageController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Age',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.calendar_today),
@@ -384,10 +355,10 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       value: _selectedGender,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Gender',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.wc),
@@ -410,10 +381,10 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       value: _selectedRelationship,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Relationship',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.group),
@@ -436,30 +407,33 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     Center(
                       child: ElevatedButton(
-                        onPressed: (){
+                        onPressed: () {
                           _submitForm();
                           _nameController.clear();
                           _ageController.clear();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xffD45700),
-                          padding: EdgeInsets.symmetric(
+                          backgroundColor: const Color(0xffD45700),
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 24, vertical: 12),
-                          textStyle: TextStyle(fontSize: 16),
+                          textStyle: const TextStyle(fontSize: 16),
                         ),
-                        child: Text('Add Person', style: TextStyle(color: Colors.white),),
+                        child: const Text(
+                          'Add Person',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 24),
-              Divider(color: Colors.grey),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 24),
+              const Divider(color: Colors.grey),
+              const SizedBox(height: 16),
+              const Text(
                 'Added Persons',
                 style: TextStyle(
                   fontSize: 20,
@@ -467,61 +441,68 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
                   color: Color(0xffD45700),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _personList.isEmpty
-                  ? Center(
-                child: Text(
-                  'No persons added yet.',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              )
+                  ? const Center(
+                      child: Text(
+                        'No persons added yet.',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
                   : ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: _personList.length,
-                itemBuilder: (context, index) {
-                  final person = _personList[index];
-                  return Card(
-                    margin: EdgeInsets.symmetric(vertical: 8),
-                    elevation: 4,
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Color(0xffD45700),
-                        child: Text(
-                          person['name']![0],
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _personList.length,
+                      itemBuilder: (context, index) {
+                        final person = _personList[index];
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          elevation: 4,
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: const Color(0xffD45700),
+                              child: Text(
+                                person['name']![0],
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            title: Text(person['name']!),
+                            subtitle: Text(
+                              'Age: ${person['age']}\nGender: ${person['gender']}\nRelationship: ${person['relationship']}',
+                              style: const TextStyle(height: 1.5),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+              _personList.isNotEmpty
+                  ? Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showPaymentConfirmationDialog(
+                              context,
+                              widget.eventData.title,
+                              widget.eventData.trainer,
+                              int.parse(widget.eventData.amount) *
+                                  _personList.length);
+                          setState(() {
+                            amountInPaisa = int.parse(widget.eventData.amount) *
+                                _personList.length;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xffD45700),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          textStyle: const TextStyle(fontSize: 16),
+                        ),
+                        child: const Text(
+                          'Book Event',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      title: Text(person['name']!),
-                      subtitle: Text(
-                        'Age: ${person['age']}\nGender: ${person['gender']}\nRelationship: ${person['relationship']}',
-                        style: TextStyle(height: 1.5),
-                      ),
-                    ),
-                  );
-                },
-              ),
-
-              _personList.isNotEmpty
-              ?Center(
-                child: ElevatedButton(
-                  onPressed: (){
-                    showPaymentConfirmationDialog(context, widget.eventData.title, widget.eventData.trainer, int.parse(widget.eventData.amount) * _personList.length);
-                    setState(() {
-                      amountInPaisa = int.parse(widget.eventData.amount) * _personList.length;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xffD45700),
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    textStyle: TextStyle(fontSize: 16),
-                  ),
-                  child: Text('Book Event', style: TextStyle(color: Colors.white),),
-                ),
-              )
-                  :SizedBox()
-
+                    )
+                  : const SizedBox()
             ],
           ),
         ),
