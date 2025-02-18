@@ -57,7 +57,7 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                     );
                   },
                   child: Container(
-                    height: 76,
+                    height: 56,
                     margin: const EdgeInsets.all(12),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     decoration: BoxDecoration(
@@ -92,7 +92,7 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(
-                  height: 12,
+                  height: 8,
                 ),
                 ListView.builder(
                   padding: EdgeInsets.zero,

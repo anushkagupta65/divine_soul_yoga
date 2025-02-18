@@ -8,9 +8,12 @@ class LogoutDialog {
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
-          message: Text(
+          message: const Text(
             "Do you really want to logout?",
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: TextStyle(
+              fontSize: 22,
+              color: Colors.black87,
+            ),
           ),
           actions: [
             CupertinoActionSheetAction(
@@ -23,10 +26,11 @@ class LogoutDialog {
               },
               child: Text(
                 "Logout",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall!
-                    .copyWith(color: Colors.red),
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.red[600],
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -36,9 +40,12 @@ class LogoutDialog {
               Navigator.pop(context);
             },
             isDefaultAction: true,
-            child: Text(
+            child: const Text(
               "Cancel",
-              style: Theme.of(context).textTheme.headlineMedium,
+              style: TextStyle(
+                fontSize: 22,
+                color: Colors.black54,
+              ),
             ),
           ),
         );

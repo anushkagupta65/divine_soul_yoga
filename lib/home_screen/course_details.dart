@@ -1,52 +1,44 @@
 import 'dart:convert';
-
 import 'package:audio_session/audio_session.dart';
-import 'package:divine_soul_yoga/home_screen/course_overview.dart';
-import 'package:divine_soul_yoga/home_screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
-import '../api_service/apiservice.dart';
 import '../models/program_data_model.dart';
 
 class CourseDetailsScreen extends StatefulWidget {
-  // final Program course;
-   final String days;
-   final String courseId;
+  final String days;
+  final String courseId;
 
   const CourseDetailsScreen({
-    Key? key, required this.days, required this.courseId,
-  }) : super(key: key);
+    super.key,
+    required this.days,
+    required this.courseId,
+  });
 
   @override
-  _CourseDetailsScreenState createState() => _CourseDetailsScreenState();
+  State<CourseDetailsScreen> createState() => _CourseDetailsScreenState();
 }
 
 class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
   late AudioPlayer _audioPlayer;
-   Course? course;
+  Course? course;
   int? _currentlyPlayingIndex; // Index of the currently playing audio
   Duration _currentPosition = Duration.zero;
   Duration _trackDuration = Duration.zero;
-  int programId = 0;
-  // late Razorpay _razorpay;
-  // int amountInPaisa = 0;
-  int _lastPlayableIndex = 0; // To control audio sequence
+  int programId = 0; // To control audio sequence
   bool isTapped = false;
   late Future<CourseResponse> futureCourses;
 
   Future<CourseResponse> fetchCourses() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String userId = prefs.getString('user_id') ?? '';
-    print(userId);
-    print("course ID ${widget.courseId}");
-    print("course days ${widget.days}");
+    debugPrint(userId);
+    debugPrint("course ID ${widget.courseId}");
+    debugPrint("course days ${widget.days}");
     final String url =
         'https://divinesoulyoga.in/api/audio/${widget.courseId}/${widget.days}/${userId}';
-    print(url);
+    debugPrint(url);
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -66,14 +58,14 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
   }
 
   Future<void> completeCourse(int courseId, int programId) async {
-    //print(widget.type);
+    //debugPrint(widget.type);
     // Define the API endpoint
     const String url = "https://divinesoulyoga.in/api/complete-course";
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String? userId = prefs.getString('user_id');
     if (userId == null) {
-      print("Error: user_id is null");
+      debugPrint("Error: user_id is null");
       return;
     }
 
@@ -83,7 +75,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
       "course_id": courseId,
       "program_id": programId
     };
-    print(requestBody);
+    debugPrint("Request body = ${requestBody.toString()}");
 
     try {
       final response = await http.post(
@@ -92,24 +84,24 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
         headers: {"Content-Type": "application/json"},
       );
 
-      print("API Response Status Code: ${response.statusCode}");
-      print("API Response Body: ${response.body}");
+      debugPrint("API Response Status Code: ${response.statusCode}");
+      debugPrint("API Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        print("Course completed successfully: ${response.body}");
+        debugPrint("Course completed successfully: ${response.body}");
         //CourseOverviewScreen.fetchCourses(widget.type);
 
         setState(() {
-          futureCourses = fetchCourses();        });
+          futureCourses = fetchCourses();
+        });
         //Navigator.push(context, MaterialPageRoute( builder: (context) => C));
       } else {
-        print("Failed to complete course: ${response.statusCode}");
-        print("Error response: ${response.body}");
+        debugPrint("Failed to complete course: ${response.statusCode}");
+        debugPrint("Error response: ${response.body}");
       }
     } catch (e) {
-      print("Error occurred: $e");
+      debugPrint("Error occurred: $e");
     }
-
   }
 
   @override
@@ -118,14 +110,6 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
     _audioPlayer = AudioPlayer();
     _initAudioSession();
     futureCourses = fetchCourses();
-
-    //amountInPaisa = (int.parse(course.amount) * 100);
-
-    // _razorpay = Razorpay();
-    //
-    // // Setting up event handlers
-    // _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    // _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
 
     // Listen to player position updates
     _audioPlayer.positionStream.listen((position) {
@@ -146,116 +130,11 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
       if (state.processingState == ProcessingState.completed) {
         completeCourse(programId, int.parse(widget.courseId));
         setState(() {
-          _currentlyPlayingIndex = null; // Reset current track index
+          _currentlyPlayingIndex = null;
         });
       }
     });
   }
-
-  // Future<void> createRazorpayOrder() async {
-  //   String keyId = "rzp_test_t9nKkE2yOuYEkA";
-  //   String keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
-  //
-  //   Map<String, dynamic> body = {
-  //     "amount": amountInPaisa,
-  //     "currency": "INR",
-  //     "receipt": "receipt#1",
-  //     "payment_capture": 1
-  //   };
-  //
-  //   var response = await http.post(
-  //     Uri.https("api.razorpay.com", "/v1/orders"),
-  //     body: jsonEncode(body),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': 'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
-  //     },
-  //   );
-  //
-  //   if (response.statusCode == 200) {
-  //     final responseData = jsonDecode(response.body);
-  //     print("Response Data: $responseData");
-  //     String orderId = responseData['id'];
-  //     openCheckout(orderId);
-  //   } else {
-  //     print("Something went wrong while creating order");
-  //   }
-  // }
-  //
-  // void openCheckout(String orderid) {
-  //   var options = {
-  //     'key': 'rzp_test_t9nKkE2yOuYEkA',
-  //     'amount': amountInPaisa * 100,
-  //     'name': widget.course.title,
-  //     'description': widget.course.title,
-  //     'order_id': orderid,
-  //   };
-  //
-  //   try {
-  //     _razorpay.open(options);
-  //   } catch (e) {
-  //     debugPrint('Error: $e');
-  //   }
-  // }
-  //
-  // void _handlePaymentSuccess(PaymentSuccessResponse response) {
-  //   Navigator.pop(context);
-  //   ApiService().buyCourse(
-  //     courseId: widget.course.id.toString(),
-  //     amount: widget.course.amount,
-  //     orderId: response.orderId.toString(),
-  //     paymentId: response.paymentId.toString(),
-  //     paymentStatus: "true",
-  //   );
-  //   isTapped = false;
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text('Payment Successful'),
-  //       content: Text('Payment ID: ${response.paymentId}'),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () {
-  //             Navigator.pop(context);
-  //             // Navigator.push(
-  //             //   context,
-  //             //   MaterialPageRoute(
-  //             //     builder: (context) => HomeScreen(),
-  //             //   ),
-  //             // );
-  //           },
-  //           child: Text('OK'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-  //
-  // void _handlePaymentError(PaymentFailureResponse response) {
-  //   ApiService().buyCourse(
-  //     courseId: widget.course.id.toString(),
-  //     amount: widget.course.amount,
-  //     orderId: response.error.toString(),
-  //     paymentId: response.toString(),
-  //     paymentStatus: "false",
-  //   );
-  //   isTapped = false;
-  //
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: Text('Payment Failed'),
-  //       content: Text('Error: ${response.message}'),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           child: Text('OK'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Future<void> _initAudioSession() async {
     final session = await AudioSession.instance;
@@ -291,11 +170,11 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final coursesList = course;
+    // final coursesList = course;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Audio",
           style: TextStyle(color: Color(0xffD45700)),
         ),
@@ -307,11 +186,17 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
               future: futureCourses,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
                 } else if (snapshot.hasError) {
-                  return Center(child: Text("Error: ${snapshot.error}"));
+                  return Center(
+                    child: Text("Error: ${snapshot.error}"),
+                  );
                 } else if (!snapshot.hasData || snapshot.data!.data.isEmpty) {
-                  return Center(child: Text("No courses available"));
+                  return const Center(
+                    child: Text("No courses available"),
+                  );
                 }
 
                 List<Course> courses = snapshot.data!.data;
@@ -322,22 +207,34 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                     final isPlaying =
                         _currentlyPlayingIndex == index && _audioPlayer.playing;
 
-                    return Card(
-                      child: ListTile(
-                        leading: Text(course.audioTime),
-                        title: Text(course.audioName,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        //subtitle: Text(course.audioName),
-                        trailing:
-                            course.playable == true
-                         ? IconButton(
-                          icon:
-                              Icon(isPlaying ? Icons.pause : Icons.play_arrow, color: Color(0xffD45700),),
-                          onPressed: () {
-                            programId = course.id;
-                            _playTrack(index, course.audioPath);
-                            } ,
-                        ) : SizedBox()
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      child: Card(
+                        child: ListTile(
+                            leading: Text(
+                              course.audioTime,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            title: Text(course.audioName,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            trailing: course.playable == true
+                                ? IconButton(
+                                    icon: Icon(
+                                      isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: const Color(0xffD45700),
+                                    ),
+                                    onPressed: () {
+                                      programId = course.id;
+                                      _playTrack(index, course.audioPath);
+                                    },
+                                  )
+                                : const SizedBox()),
                       ),
                     );
                   },
@@ -356,11 +253,11 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                     children: [
                       Text(
                         _currentPosition.toString().split('.').first,
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                       Text(
                         _trackDuration.toString().split('.').first,
-                        style: TextStyle(color: Colors.black),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ],
                   ),
@@ -371,7 +268,9 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                     value: _currentPosition.inSeconds.toDouble(),
                     onChanged: (value) {
                       setState(() {
-                        _audioPlayer.seek(Duration(seconds: value.toInt()));
+                        _audioPlayer.seek(
+                          Duration(seconds: value.toInt()),
+                        );
                       });
                     },
                   ),
