@@ -1,8 +1,8 @@
 import 'dart:developer';
-import 'package:divine_soul_yoga/home_screen/home_screen.dart';
-import 'package:divine_soul_yoga/home_screen/profile.dart';
-import 'package:divine_soul_yoga/login/login.dart';
-import 'package:divine_soul_yoga/provider/userprovider.dart';
+import 'package:divine_soul_yoga/src/presentation/home_screen/home_screen.dart';
+import 'package:divine_soul_yoga/src/presentation/home_screen/profile.dart';
+import 'package:divine_soul_yoga/src/presentation/login/login.dart';
+import 'package:divine_soul_yoga/src/provider/userprovider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
