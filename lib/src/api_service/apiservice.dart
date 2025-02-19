@@ -35,10 +35,10 @@ class ApiService {
         'https://divinesoulyoga.in/api/courses-payment-update?user_id=$userId&course_id=$courseId&payment_status=$paymentStatus&amount=$amount&payment_id=$paymentId';
 
     print(userId.toString());
-    print(courseId);
-    print(amount);
-    print(orderId);
-    print(paymentId);
+    print(courseId.toString());
+    print(amount.toString());
+    print(orderId.toString());
+    print(paymentId.toString());
 
     // Create the request body
 

@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:divine_soul_yoga/src/api_service/apiservice.dart';
 import 'package:divine_soul_yoga/src/models/testimonialsmodel.dart';
 import 'package:divine_soul_yoga/src/presentation/home_screen/about_us.dart';
@@ -17,6 +18,7 @@ import 'package:divine_soul_yoga/src/presentation/utils/logout_dialog.dart';
 import 'package:divine_soul_yoga/src/provider/userprovider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -745,12 +747,13 @@ class _SwipeableCardState extends State<SwipeableCard> {
   @override
   Widget build(BuildContext context) {
     final testimonialsList = testimonials ?? [];
-    print("Testimonials list: $testimonialsList"); // Check the list contents
+    print("Testimonials list: $testimonialsList"); // Debugging
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.5,
+          height: 480.h,
           child: testimonialsList.isEmpty
               ? const Center(child: Text("No testimonials available"))
               : PageView.builder(
@@ -760,39 +763,33 @@ class _SwipeableCardState extends State<SwipeableCard> {
                     final test = testimonialsList[index];
                     return Column(
                       children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.4,
-                          child: Center(
-                            child: Container(
+                        Padding(
+                          padding: EdgeInsets.only(top: 8.h),
+                          child: SizedBox(
+                            height: 400.h,
+                            child: Center(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0),
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 18.sp),
                                 child: Stack(
                                   children: [
                                     Image.asset(
                                       "assets/images/preview1.png",
                                       height: 500,
                                     ),
-                                    Positioned.fill(
-                                      child: Center(
-                                        child: SizedBox(
-                                          height: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.35,
-                                          child: Center(
-                                            child: Text(
-                                              test.detail ??
-                                                  "No detail available",
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w300,
-                                                color: const Color(0xff666666),
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
+                                    Center(
+                                      child: AutoSizeText(
+                                        maxFontSize: 16,
+                                        minFontSize: 16,
+                                        maxLines: 18,
+                                        overflow: TextOverflow.ellipsis,
+                                        test.detail?.toString() ??
+                                            "No detail available",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w300,
+                                          color: Color(0xff666666),
                                         ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                   ],
@@ -801,17 +798,19 @@ class _SwipeableCardState extends State<SwipeableCard> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
                         Padding(
-                          padding: const EdgeInsets.only(right: 15, bottom: 15),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 14.w, vertical: 14.h),
                           child: Container(
                             alignment: Alignment.centerRight,
-                            child: Text(
-                              test.name ?? 'No name available',
+                            child: AutoSizeText(
+                              minFontSize: 18,
+                              maxFontSize: 22,
+                              test.name?.toString() ?? 'No name available',
                               style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w300,
-                                  color: Color(0xffD45700)),
+                                fontWeight: FontWeight.w300,
+                                color: Color(0xffD45700),
+                              ),
                             ),
                           ),
                         ),
@@ -825,8 +824,11 @@ class _SwipeableCardState extends State<SwipeableCard> {
           child: SmoothPageIndicator(
             controller: _controller,
             count: testimonialsList.length,
-            effect: WormEffect(
-                dotHeight: 8, dotWidth: 8, activeDotColor: Color(0xffD45700)),
+            effect: const WormEffect(
+              dotHeight: 8,
+              dotWidth: 8,
+              activeDotColor: Color(0xffD45700),
+            ),
           ),
         ),
       ],

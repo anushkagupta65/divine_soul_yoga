@@ -1,8 +1,11 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:divine_soul_yoga/src/api_service/apiservice.dart';
+import 'package:divine_soul_yoga/src/presentation/home/home_drawer_widget.dart';
 import 'package:divine_soul_yoga/src/presentation/home_screen/course_overview.dart';
 import 'package:divine_soul_yoga/src/presentation/home_screen/home_screen.dart';
 import 'package:divine_soul_yoga/src/presentation/home_screen/subscription.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Programtab extends StatefulWidget {
   const Programtab({super.key});
@@ -12,8 +15,6 @@ class Programtab extends StatefulWidget {
 }
 
 class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
-  late PageController pageViewController;
-  late TabController tabController;
   List? arrProgramData = [];
   bool isLoading = true;
 
@@ -21,8 +22,6 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     programData();
-    pageViewController = PageController();
-    tabController = TabController(length: 3, vsync: this);
   }
 
   Future<void> programData() async {
@@ -43,7 +42,7 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
             ),
           )
         : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -57,9 +56,8 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                     );
                   },
                   child: Container(
-                    height: 56,
-                    margin: const EdgeInsets.all(12),
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    height: 56.h,
+                    margin: EdgeInsets.all(8.sp),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [
@@ -69,21 +67,22 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [
+                      borderRadius: BorderRadius.circular(12.r),
+                      boxShadow: [
                         BoxShadow(
                           color: Colors.black38,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
+                          blurRadius: 8.r,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
                     child: const Center(
-                      child: Text(
+                      child: AutoSizeText(
+                        textAlign: TextAlign.center,
+                        maxFontSize: 22,
+                        minFontSize: 22,
                         "Subscribe & Transform",
                         style: TextStyle(
-                          letterSpacing: 1.5,
-                          fontSize: 24,
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                         ),
@@ -91,17 +90,13 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 8,
-                ),
                 ListView.builder(
-                  padding: EdgeInsets.zero,
                   itemCount: arrProgramData!.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      padding: EdgeInsets.only(bottom: 16.h),
                       child: Align(
                         alignment: Alignment.center,
                         child: InkWell(
@@ -146,37 +141,35 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                     );
                   },
                 ),
-                const SizedBox(
-                  height: 12,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 6),
-                  child: Center(
-                    child: Text(
-                      'Happiness & divine love is in air!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xffD45700)),
-                    ),
+                const Center(
+                  child: Text(
+                    'Happiness & divine love is in air!',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xffD45700)),
                   ),
                 ),
-                const SizedBox(
-                  height: 12,
+                SizedBox(
+                  height: 12.h,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    iconText(
-                      "Bliss   \nMeditation   ",
-                      "Meditation is a mental training practice that teaches you to slow down racing thoughts.",
-                      'assets/images/mp1.png',
+                    Expanded(
+                      child: iconText(
+                        "Bliss\nMeditation",
+                        "Meditation is a mental training practice that teaches you to slow down racing thoughts.",
+                        'assets/images/mp1.png',
+                      ),
                     ),
-                    iconText(
-                      "Divine   \nhealing   ",
-                      "Becoming more aware of the present moment can help us enjoy the world around us.",
-                      'assets/images/mp2.png',
+                    Expanded(
+                      child: iconText(
+                        "Divine\nhealing",
+                        "Becoming more aware of the present moment can help us enjoy the world around us.",
+                        'assets/images/mp2.png',
+                      ),
                     ),
                   ],
                 ),
@@ -187,12 +180,12 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     iconText(
-                      "Laughter \ntherapy   ",
+                      "Laughter\ntherapy",
                       "The body is of utmost importance for our holistic health as it is here that the mental and spiritual realms reside.",
                       'assets/images/mp3.png',
                     ),
                     iconText(
-                      "Yoga   \nAsana​   ",
+                      "Yoga\nAsana​",
                       "The body is of utmost importance for our holistic health as it is here that the mental and spiritual realms reside.",
                       'assets/images/mp3.png',
                     ),
@@ -266,10 +259,11 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                               ),
                               child: Padding(
                                 padding: EdgeInsets.all(30.0),
-                                child: Text(
+                                child: AutoSizeText(
+                                  minFontSize: 20,
+                                  maxFontSize: 24,
                                   "Testimonials",
                                   style: TextStyle(
-                                      fontSize: 30,
                                       fontWeight: FontWeight.w400,
                                       color: Color(0xff000000)),
                                   textAlign: TextAlign.center,
@@ -278,7 +272,7 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 25),
+                            padding: EdgeInsets.symmetric(horizontal: 24.h),
                             child: Container(
                               // color: Colors.black,
                               alignment: Alignment.centerLeft,
@@ -302,29 +296,30 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
 
   Widget iconText(String title, String description, String iconPath) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: EdgeInsets.symmetric(horizontal: 4.w),
       child: Card(
-        elevation: 5,
+        elevation: 2,
         child: SizedBox(
-          width: 178,
+          width: 144.w,
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 10, top: 10),
+                padding: EdgeInsets.only(left: 10.w, top: 10.h),
                 child: Row(
                   children: [
                     Image.asset(
                       iconPath,
                       fit: BoxFit.cover,
-                      width: 55,
+                      width: 48.w,
                     ),
-                    const SizedBox(
-                      width: 8,
+                    SizedBox(
+                      width: 6.w,
                     ),
-                    Text(
+                    AutoSizeText(
+                      maxFontSize: 12,
+                      minFontSize: 12,
                       title,
                       style: const TextStyle(
-                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Color(0xff000000)),
                     )
@@ -332,8 +327,12 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(14.0),
-                child: Text(description),
+                padding: EdgeInsets.all(12.sp),
+                child: AutoSizeText(
+                  description,
+                  maxFontSize: 12,
+                  minFontSize: 12,
+                ),
               )
             ],
           ),

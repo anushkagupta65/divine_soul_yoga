@@ -4,6 +4,7 @@ import 'package:divine_soul_yoga/src/presentation/home_screen/profile.dart';
 import 'package:divine_soul_yoga/src/presentation/login/login.dart';
 import 'package:divine_soul_yoga/src/provider/userprovider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -62,15 +63,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Divine Soul Yoga',
-      theme: ThemeData(
-        fontFamily: 'Gotu',
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return ScreenUtilInit(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Divine Soul Yoga',
+        theme: ThemeData(
+          fontFamily: 'Gotu',
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: firstScreen,
       ),
-      home: firstScreen,
     );
   }
 }
