@@ -27,14 +27,11 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
   @override
   void initState() {
     super.initState();
-    // Initial loading of courses
     _loadCourses();
 
-    _razorpay = Razorpay();
-
-    // Setting up event handlers
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    // _razorpay = Razorpay();
+    // _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    // _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
   }
 
   Future<void> _loadCourses() async {
@@ -243,56 +240,56 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
                             const SizedBox(
                               height: 12,
                             ),
-                            course.paid == false
-                                ? Center(
-                                    child: InkWell(
-                                      onTap: () {
-                                        courseId = course.id.toString();
-                                        titleCourse = course.title;
-                                        amountInPaisa =
-                                            (int.parse(course.amount) * 100);
+                            // course.paid == false
+                            //     ? Center(
+                            //         child: InkWell(
+                            //           onTap: () {
+                            //             courseId = course.id.toString();
+                            //             titleCourse = course.title;
+                            //             amountInPaisa =
+                            //                 (int.parse(course.amount) * 100);
 
-                                        createRazorpayOrder();
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xffD45700),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 14, horizontal: 30),
-                                          child: Text(
-                                            "Buy Now ₹${course.amount}",
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Center(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 14, horizontal: 30),
-                                        child: Text(
-                                          "Go to Course",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
+                            //             createRazorpayOrder();
+                            //           },
+                            //           child: Container(
+                            //             decoration: BoxDecoration(
+                            //               color: const Color(0xffD45700),
+                            //               borderRadius:
+                            //                   BorderRadius.circular(15),
+                            //             ),
+                            //             child: Padding(
+                            //               padding: const EdgeInsets.symmetric(
+                            //                   vertical: 14, horizontal: 30),
+                            //               child: Text(
+                            //                 "Buy Now ₹${course.amount}",
+                            //                 style: const TextStyle(
+                            //                   color: Colors.white,
+                            //                   fontSize: 14,
+                            //                 ),
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       )
+                            //     : Center(
+                            //         child: Container(
+                            //           decoration: BoxDecoration(
+                            //             color: Colors.green,
+                            //             borderRadius: BorderRadius.circular(15),
+                            //           ),
+                            //           child: const Padding(
+                            //             padding: EdgeInsets.symmetric(
+                            //                 vertical: 14, horizontal: 30),
+                            //             child: Text(
+                            //               "Go to Course",
+                            //               style: TextStyle(
+                            //                 color: Colors.white,
+                            //                 fontSize: 14,
+                            //               ),
+                            //             ),
+                            //           ),
+                            //         ),
+                            //       )
                           ],
                         ),
                       ),

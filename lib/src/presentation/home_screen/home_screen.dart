@@ -196,71 +196,76 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   child: profileProvider.isLoading
                       ? SizedBox()
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      : (profileProvider.profileData == null
+                          ? const Center(
+                              child: Text('Profile data not available'))
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                InkWell(
-                                  onTap: _closeDrawer,
-                                  child: const Icon(
-                                    Icons.arrow_back,
-                                    size: 30.0,
-                                    color: Color(0xffffffff),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const Profile(index: "1"),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      onTap: _closeDrawer,
+                                      child: const Icon(
+                                        Icons.arrow_back,
+                                        size: 30.0,
+                                        color: Color(0xffffffff),
                                       ),
-                                    );
-                                  },
-                                  child: Image.asset(
-                                    "assets/images/pgd.png",
-                                    width: 24,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Profile(index: "1"),
+                                          ),
+                                        );
+                                      },
+                                      child: Image.asset(
+                                        "assets/images/pgd.png",
+                                        width: 24,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                profileProvider.profileData?["user"]
+                                            ["profile_image"] !=
+                                        null
+                                    ? CircleAvatar(
+                                        radius: 50.0,
+                                        backgroundImage: (profileProvider
+                                                        .profileData!['user']
+                                                    ['profile_image'] !=
+                                                "")
+                                            ? NetworkImage(profileProvider
+                                                    .profileData!['user']
+                                                ['profile_image'])
+                                            : const AssetImage(
+                                                "assets/images/act1.png"))
+                                    : const CircleAvatar(
+                                        radius: 50.0,
+                                        backgroundImage: AssetImage(
+                                            "assets/images/act1.png")),
+                                const SizedBox(
+                                  width: 40,
+                                  height: 10,
+                                ),
+                                Text(
+                                  profileProvider.profileData!["user"]
+                                          ["name"] ??
+                                      '',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ],
-                            ),
-                            profileProvider.profileData!["user"]
-                                        ["profile_image"] !=
-                                    null
-                                ? CircleAvatar(
-                                    radius: 50.0,
-                                    backgroundImage: (profileProvider
-                                                    .profileData!['user']
-                                                ['profile_image'] !=
-                                            "")
-                                        ? NetworkImage(
-                                            profileProvider.profileData!['user']
-                                                ['profile_image'])
-                                        : const AssetImage(
-                                            "assets/images/act1.png"))
-                                : const CircleAvatar(
-                                    radius: 50.0,
-                                    backgroundImage:
-                                        AssetImage("assets/images/act1.png")),
-                            const SizedBox(
-                              width: 40,
-                              height: 10,
-                            ),
-                            Text(
-                              profileProvider.profileData!["user"]["name"] ??
-                                  '',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 28,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ],
-                        ),
+                            )),
                 ),
               ),
               ListTile(
@@ -476,11 +481,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                     const Profile(index: '1')),
                                           );
                                         },
-                                        child: profileProvider
-                                                        .profileData!["user"]
-                                                    ["profile_image"] !=
-                                                null
-                                            ? CircleAvatar(
+                                        child: profileProvider.profileData ==
+                                                    null ||
+                                                profileProvider.profileData![
+                                                            "user"]
+                                                        ["profile_image"] ==
+                                                    null
+                                            ? const CircleAvatar(
+                                                radius: 25,
+                                                backgroundImage: AssetImage(
+                                                    "assets/images/act1.png"),
+                                              )
+                                            : CircleAvatar(
                                                 radius: 23.0,
                                                 backgroundImage: (profileProvider
                                                                     .profileData![
@@ -493,11 +505,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                         ['profile_image'])
                                                     : const AssetImage(
                                                         "assets/images/act1.png"),
-                                              )
-                                            : const CircleAvatar(
-                                                radius: 25,
-                                                backgroundImage: AssetImage(
-                                                    "assets/images/act1.png"),
                                               ),
                                       )
                                     ],
@@ -783,7 +790,7 @@ class _SwipeableCardState extends State<SwipeableCard> {
                                         minFontSize: 16,
                                         maxLines: 18,
                                         overflow: TextOverflow.ellipsis,
-                                        test.detail?.toString() ??
+                                        test.detail.toString() ??
                                             "No detail available",
                                         style: const TextStyle(
                                           fontWeight: FontWeight.w300,
@@ -806,7 +813,7 @@ class _SwipeableCardState extends State<SwipeableCard> {
                             child: AutoSizeText(
                               minFontSize: 18,
                               maxFontSize: 22,
-                              test.name?.toString() ?? 'No name available',
+                              test.name.toString() ?? 'No name available',
                               style: TextStyle(
                                 fontWeight: FontWeight.w300,
                                 color: Color(0xffD45700),

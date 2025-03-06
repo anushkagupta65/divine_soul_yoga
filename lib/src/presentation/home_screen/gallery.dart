@@ -45,101 +45,63 @@ class _GalleryState extends State<Gallery> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        child: galleryData != null && galleryData!.isNotEmpty
-            ? Column(
+      child: galleryData != null && galleryData!.isNotEmpty
+          ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
                 children: [
-                  // Check if galleryData is not null and contains data
-                  // if (galleryData != null && galleryData!.isNotEmpty)
                   ListView.builder(
                     padding: EdgeInsets.zero,
                     itemCount: galleryData!.length,
-                    shrinkWrap:
-                        true, // Ensures the list doesn't take more space than required
-                    physics:
-                        NeverScrollableScrollPhysics(), // Disables scrolling
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, index) {
                       var galleryItem = galleryData![index];
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 10),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              galleryItem.title, // Display title dynamically
-                              style: TextStyle(
+                              galleryItem.title,
+                              style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Color.fromRGBO(253, 96, 5, 1)),
                             ),
                           ),
-                          SizedBox(height: 20), // Add space between the cards
-
-                          // Check if gallery.images has at least 3 images before displaying them
+                          const SizedBox(height: 6),
                           if (galleryItem.images.isNotEmpty)
                             SizedBox(
                               height: 210,
-                              child: Card(
-                                child: Row(
-                                  children: [
-                                    // First image taking half of the screen
-                                    Expanded(
-                                      flex: 1,
-                                      child: galleryItem.images.isNotEmpty
-                                          ? GestureDetector(
-                                              onTap: () {
-                                                _showFullScreenImage(
-                                                    context,
-                                                    galleryItem
-                                                        .images[0].imageUrl);
-                                              },
-                                              child: Image.network(
-                                                "https://divinesoulyoga.in/${galleryItem.images[0].imageUrl}",
-                                                fit: BoxFit.cover,
-                                                height: double
-                                                    .infinity, // Ensure height is set
-                                              ),
-                                            )
-                                          : Container(), // Fallback if no image
-                                    ),
-                                    // Second half containing two images
-                                    Expanded(
-                                      flex: 1,
-                                      child: Column(
-                                        children: [
-                                          galleryItem.images.length > 1
-                                              ? GestureDetector(
-                                                  onTap: () {
-                                                    _showFullScreenImage(
-                                                        context,
-                                                        "${galleryItem.images[1].imageUrl}");
-                                                  },
-                                                  child: Image.network(
-                                                    "https://divinesoulyoga.in/${galleryItem.images[1].imageUrl}",
-                                                    fit: BoxFit.cover,
-                                                    height:
-                                                        100, // Set a fixed height for the image
-                                                  ),
-                                                )
-                                              : Container(),
-                                          galleryItem.images.length > 2
-                                              ? GestureDetector(
-                                                  onTap: () {
-                                                    _showFullScreenImage(
-                                                        context,
-                                                        "${galleryItem.images[2].imageUrl}");
-                                                  },
-                                                  child: Image.network(
-                                                    "https://divinesoulyoga.in/${galleryItem.images[2].imageUrl}",
-                                                    fit: BoxFit.cover,
-                                                    height:
-                                                        100, // Set a fixed height for the image
-                                                  ),
-                                                )
-                                              : Container(),
-                                        ],
+                              child: SizedBox(
+                                height: 200,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: galleryItem.images.length,
+                                  itemBuilder: (context, index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        _showFullScreenImage(context,
+                                            galleryItem.images[index].imageUrl);
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 5.0),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.network(
+                                            "https://divinesoulyoga.in/${galleryItem.images[index].imageUrl}",
+                                            fit: BoxFit.cover,
+                                            width: 150,
+                                            height: double.infinity,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -147,14 +109,17 @@ class _GalleryState extends State<Gallery> {
                       );
                     },
                   ),
+                  const SizedBox(height: 12),
                 ],
-              )
-            : Container(
-                height: MediaQuery.of(context).size.height * 0.4,
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ));
+              ),
+            )
+          : SizedBox(
+              height: MediaQuery.of(context).size.height * 0.4,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+    );
   }
 }
 

@@ -164,9 +164,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
   }
 
   void _handleTileTap(int index, Course course, List<Course> courses) {
-    if (!course.paid) {
-      _showDialog("To access this audio, you need to purchase the course.");
-    } else if (course.paid && !course.playable) {
+    if (!course.playable) {
       _showDialog("Please finish the previous audio before accessing this.");
     } else {
       programId = course.id;

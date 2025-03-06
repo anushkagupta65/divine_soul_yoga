@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:divine_soul_yoga/src/presentation/home_screen/home_screen.dart';
 import 'package:divine_soul_yoga/src/presentation/home_screen/profile.dart';
 import 'package:divine_soul_yoga/src/models/usermodel.dart';
@@ -138,38 +140,42 @@ class _LoginState extends State<Login> {
     final url = Uri.parse('http://68.183.83.189/api/login');
 
     try {
-      final requestBody = {
-        'mobile': mobile,
-        //'email': "$mobile@gmail.com"
-      };
+      // Log the request details
+      print("Sending request to $url with body: {'mobile': '$mobile'}");
 
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(requestBody),
-      );
+      // Send the POST request with a 10-second timeout
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'mobile': mobile}),
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () => throw TimeoutException("Request timed out"),
+          );
+
+      // Log the response details
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
         // Login successful
         final data = jsonDecode(response.body);
         print("Login successful: ${data['message']}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Login successful.")),
+          const SnackBar(content: Text("Login successful.")),
         );
 
         // Open the OTP verification modal
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(60),
-            ),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
           ),
           builder: (context) {
-            return BottomSheetContent(
-              initialNumber: _controller.text.trim(),
-            );
+            return BottomSheetContent(initialNumber: mobile);
           },
         );
       } else if (response.statusCode == 201) {
@@ -177,22 +183,18 @@ class _LoginState extends State<Login> {
         final data = jsonDecode(response.body);
         print("Account created successfully: ${data['message']}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Account created successfully.")),
+          const SnackBar(content: Text("Account created successfully.")),
         );
 
         // Open the OTP verification modal
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(60),
-            ),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(60)),
           ),
           builder: (context) {
-            return BottomSheetContent(
-              initialNumber: _controller.text.trim(),
-            );
+            return BottomSheetContent(initialNumber: mobile);
           },
         );
       } else {
@@ -200,14 +202,25 @@ class _LoginState extends State<Login> {
         final data = jsonDecode(response.body);
         print("Error: ${data['message']}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'])),
+          SnackBar(content: Text("Error: ${data['message']}")),
         );
       }
     } catch (e) {
-      // Handle unexpected exceptions
-      print("An error occurred: $e");
+      // Handle specific exceptions with detailed feedback
+      String errorMessage;
+      if (e is http.ClientException) {
+        errorMessage = "Network error: Unable to connect to the server.";
+      } else if (e is FormatException) {
+        errorMessage = "Invalid response from server.";
+      } else if (e is TimeoutException) {
+        errorMessage = "Request timed out. Please check your connection.";
+      } else {
+        errorMessage = "An unexpected error occurred: $e";
+      }
+
+      print("Exception details: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An unexpected error occurred.")),
+        SnackBar(content: Text(errorMessage)),
       );
     }
   }

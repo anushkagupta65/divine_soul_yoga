@@ -191,55 +191,55 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
+                // Padding(
+                //   padding:
+                //       const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                //   child: Card(
+                //     elevation: 3,
+                //     child: Container(
+                //       decoration: BoxDecoration(
+                //         color: const Color(0xffffffff),
+                //         borderRadius: BorderRadius.circular(10),
+                //       ),
+                //       width: MediaQuery.of(context).size.width,
+                //       child: const Column(
+                //         children: [
+                //           SizedBox(
+                //             height: 25,
+                //           ),
+                //           Padding(
+                //             padding: EdgeInsets.symmetric(horizontal: 20.0),
+                //             child: Text(
+                //               "Let's create a new world of love with Dr. Deepak Mittal !​",
+                //               style: TextStyle(
+                //                 fontSize: 20,
+                //                 fontWeight: FontWeight.w400,
+                //                 color: Color(0xff000000),
+                //               ),
+                //             ),
+                //           ),
+                //           Padding(
+                //             padding: EdgeInsets.all(20.0),
+                //             child: Text(
+                //               "Originated in the foothills of the Himalayas, Divine Soul Yoga is an oasis of love, peace, and harmony!Our beloved master, Dr. Deepak Mittal has specially curated a holistic life-altering wellness solution. At Divine Soul Yoga, the ancient science of life and its secret treasures are revealed with soul-enriching meditation retreats in the lap of nature.Authentic yoga is taught by well-qualified yoga experts.",
+                //               style: TextStyle(
+                //                   fontSize: 18,
+                //                   fontWeight: FontWeight.w300,
+                //                   color: Color(0xff666666),
+                //                   height: 0),
+                //             ),
+                //           ),
+                //           SizedBox(
+                //             height: 24,
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-                  child: Card(
-                    elevation: 3,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xffffffff),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: MediaQuery.of(context).size.width,
-                      child: const Column(
-                        children: [
-                          SizedBox(
-                            height: 25,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.0),
-                            child: Text(
-                              "Let's create a new world of love with Dr. Deepak Mittal !​",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xff000000),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(20.0),
-                            child: Text(
-                              "Originated in the foothills of the Himalayas, Divine Soul Yoga is an oasis of love, peace, and harmony!Our beloved master, Dr. Deepak Mittal has specially curated a holistic life-altering wellness solution. At Divine Soul Yoga, the ancient science of life and its secret treasures are revealed with soul-enriching meditation retreats in the lap of nature.Authentic yoga is taught by well-qualified yoga experts.",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w300,
-                                  color: Color(0xff666666),
-                                  height: 0),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 24,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 16, right: 16, bottom: 24),
                   child: Card(
                     elevation: 3,
                     child: Container(
@@ -262,7 +262,7 @@ class _ProgramtabState extends State<Programtab> with TickerProviderStateMixin {
                                 child: AutoSizeText(
                                   minFontSize: 20,
                                   maxFontSize: 24,
-                                  "Testimonials",
+                                  "Review",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       color: Color(0xff000000)),

@@ -27,10 +27,7 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
   final List<String> _genders = ['Male', 'Female', 'Other'];
   final List<String> _relationships = [
     'Self',
-    'Friend',
     'Family',
-    'Colleague',
-    'Other'
   ];
   late Razorpay _razorpay;
   int amountInPaisa = 0;

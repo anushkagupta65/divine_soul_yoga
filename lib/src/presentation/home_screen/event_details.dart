@@ -319,7 +319,14 @@ class _EventDetailsState extends State<EventDetails> {
             ),
             Padding(
               padding: const EdgeInsets.all(12.0),
-              child: Html(data: widget.eventData.description),
+              child: Html(
+                data: widget.eventData.description,
+                style: {
+                  "body": Style(
+                    textAlign: TextAlign.justify, // Justify text
+                  ),
+                },
+              ),
             ),
             const SizedBox(
               height: 20,
