@@ -130,7 +130,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Payment Failed'),
-        content: Text('Error: ${response.message}'),
+        content: const Text('Error: Payment Failed.'),
+        // content: Text('Error: ${response.message}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -220,10 +221,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset('assets/images/group1.png'),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  // Image.asset('assets/images/group1.png'),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: ListView.builder(
@@ -240,7 +241,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               : Colors.white70,
                           child: ListTile(
                             title: Text(
-                              "${subscription['name']} - ${subscription['validity']} months",
+                              "${subscription['name']} - ${subscription['validity']} ${subscription['validity'] == "1" ? 'month' : 'months'}",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color:

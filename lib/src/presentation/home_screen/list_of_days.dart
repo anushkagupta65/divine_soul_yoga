@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 
 class ListOfDays extends StatefulWidget {
   final courseId;
-  const ListOfDays({super.key, this.courseId});
+  final userid;
+  const ListOfDays({super.key, this.courseId, this.userid});
 
   @override
   State<ListOfDays> createState() => _ListOfDaysState();
@@ -23,8 +24,10 @@ class _ListOfDaysState extends State<ListOfDays> {
 
   Future<void> fetchDays() async {
     try {
-      final response = await http.get(
-          Uri.parse('https://divinesoulyoga.in/api/day/${widget.courseId}'));
+      final response = await http.get(Uri.parse(
+          'https://divinesoulyoga.in/api/day/${widget.userid}/${widget.courseId}'));
+      print(
+          "\n\n ==============================================here it is : ${response.body} \n\n");
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         final List<dynamic> data = responseData['data'];

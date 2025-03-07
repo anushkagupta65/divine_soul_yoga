@@ -17,31 +17,35 @@ class CourseOverviewScreen extends StatefulWidget {
 }
 
 class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
-  late Future<List<Program>> _coursesFuture;
-  late Razorpay _razorpay;
+  Future<List<Program>>? _coursesFuture; // Nullable Future
+  Razorpay? _razorpay; // Nullable Razorpay instance
   int amountInPaisa = 0;
   bool isTapped = false;
   String? titleCourse;
   String? courseId;
+  String? userId;
 
   @override
   void initState() {
     super.initState();
-    _loadCourses();
-
-    // _razorpay = Razorpay();
-    // _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    // _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay = Razorpay(); // Initialize Razorpay immediately
+    _razorpay!
+      ..on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess)
+      ..on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _loadUserIdAndCourses(); // Load userId and courses
   }
 
-  Future<void> _loadCourses() async {
-    _coursesFuture = fetchCourses(widget.type);
-    setState(() {}); // Trigger a rebuild to show the updated courses
+  Future<void> _loadUserIdAndCourses() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('user_id'); // Store userId in state
+      _coursesFuture = fetchCourses(widget.type); // Assign Future directly
+    });
   }
 
   static Future<List<Program>> fetchCourses(String type) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('user_id');
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('user_id');
     final url = 'https://divinesoulyoga.in/api/programData/$type/$userId';
     try {
       final response = await http.get(Uri.parse(url));
@@ -58,47 +62,47 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
   }
 
   Future<void> createRazorpayOrder() async {
-    String keyId = "rzp_test_t9nKkE2yOuYEkA";
-    String keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
+    const keyId = "rzp_test_t9nKkE2yOuYEkA";
+    const keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
 
-    Map<String, dynamic> body = {
+    final body = {
       "amount": amountInPaisa,
       "currency": "INR",
       "receipt": "receipt#1",
       "payment_capture": 1
     };
 
-    var response = await http.post(
+    final response = await http.post(
       Uri.https("api.razorpay.com", "/v1/orders"),
       body: jsonEncode(body),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
+            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}',
       },
     );
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       print("Response Data: $responseData");
-      String orderId = responseData['id'];
+      final orderId = responseData['id'] as String;
       openCheckout(orderId);
     } else {
       print("Something went wrong while creating order");
     }
   }
 
-  void openCheckout(String orderid) {
-    var options = {
+  void openCheckout(String orderId) {
+    final options = {
       'key': 'rzp_test_t9nKkE2yOuYEkA',
       'amount': amountInPaisa * 100,
       'name': titleCourse,
       'description': titleCourse,
-      'order_id': orderid,
+      'order_id': orderId,
     };
 
     try {
-      _razorpay.open(options);
+      _razorpay!.open(options);
     } catch (e) {
       debugPrint('Error: $e');
     }
@@ -122,9 +126,7 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
         content: Text('Payment ID: ${response.paymentId}'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
+            onPressed: () => Navigator.pop(context),
             child: const Text('OK'),
           ),
         ],
@@ -146,7 +148,8 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Payment Failed'),
-        content: Text('Error: ${response.message}'),
+        content: const Text('Error: Payment Failed.'),
+        // content: Text('Error: ${response.message}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -163,144 +166,108 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
       appBar: AppBar(
         title: const Text(
           "Courses Overview",
-          style: TextStyle(
-            color: Color(0xffD45700),
-          ),
+          style: TextStyle(color: Color(0xffD45700)),
         ),
       ),
-      body: FutureBuilder<List<Program>>(
-        future: _coursesFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No courses available.'));
-          } else {
-            final courses = snapshot.data!;
-            return ListView.builder(
-              itemCount: courses.length,
-              itemBuilder: (context, index) {
-                final course = courses[index];
-                return GestureDetector(
-                  onTap: () {
-                    print(course.id);
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ListOfDays(courseId: course.id),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12,
-                      right: 12,
-                      bottom: 16,
-                    ),
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 10,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 12),
-                              child: SizedBox(
-                                width: MediaQuery.sizeOf(context).width * 60,
-                                child: Image.network(
-                                  "https://divinesoulyoga.in/${course.image}",
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Icon(Icons.broken_image,
-                                        size: 100);
-                                  },
+      body: _coursesFuture == null
+          ? const Center(child: CircularProgressIndicator())
+          : FutureBuilder<List<Program>>(
+              future: _coursesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No courses available.'));
+                } else {
+                  final courses = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: courses.length,
+                    itemBuilder: (context, index) {
+                      final course = courses[index];
+                      return GestureDetector(
+                        onTap: () {
+                          print(course.id);
+                          if (userId != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ListOfDays(
+                                  userid: userId!,
+                                  courseId: course.id,
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            Text(
-                              '${course.title}',
-                              style: const TextStyle(
-                                color: Color(0xffD45700),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'User ID not found. Please log in again.'),
+                              ),
+                            );
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 12,
+                            right: 12,
+                            bottom: 16,
+                          ),
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 10,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: SizedBox(
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.9,
+                                      child: Image.network(
+                                        "https://divinesoulyoga.in/${course.image}",
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return const Icon(Icons.broken_image,
+                                              size: 100);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    course.title,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Color(0xffD45700),
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                ],
                               ),
                             ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            // course.paid == false
-                            //     ? Center(
-                            //         child: InkWell(
-                            //           onTap: () {
-                            //             courseId = course.id.toString();
-                            //             titleCourse = course.title;
-                            //             amountInPaisa =
-                            //                 (int.parse(course.amount) * 100);
-
-                            //             createRazorpayOrder();
-                            //           },
-                            //           child: Container(
-                            //             decoration: BoxDecoration(
-                            //               color: const Color(0xffD45700),
-                            //               borderRadius:
-                            //                   BorderRadius.circular(15),
-                            //             ),
-                            //             child: Padding(
-                            //               padding: const EdgeInsets.symmetric(
-                            //                   vertical: 14, horizontal: 30),
-                            //               child: Text(
-                            //                 "Buy Now ₹${course.amount}",
-                            //                 style: const TextStyle(
-                            //                   color: Colors.white,
-                            //                   fontSize: 14,
-                            //                 ),
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ),
-                            //       )
-                            //     : Center(
-                            //         child: Container(
-                            //           decoration: BoxDecoration(
-                            //             color: Colors.green,
-                            //             borderRadius: BorderRadius.circular(15),
-                            //           ),
-                            //           child: const Padding(
-                            //             padding: EdgeInsets.symmetric(
-                            //                 vertical: 14, horizontal: 30),
-                            //             child: Text(
-                            //               "Go to Course",
-                            //               style: TextStyle(
-                            //                 color: Colors.white,
-                            //                 fontSize: 14,
-                            //               ),
-                            //             ),
-                            //           ),
-                            //         ),
-                            //       )
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                );
+                      );
+                    },
+                  );
+                }
               },
-            );
-          }
-        },
-      ),
+            ),
     );
+  }
+
+  @override
+  void dispose() {
+    _razorpay?.clear(); // Safely clear Razorpay instance if it exists
+    super.dispose();
   }
 }

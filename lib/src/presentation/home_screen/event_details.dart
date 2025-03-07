@@ -139,7 +139,8 @@ class _EventDetailsState extends State<EventDetails> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Payment Failed'),
-        content: Text('Error: ${response.message}'),
+        content: const Text('Error: Payment Failed.'),
+        // content: Text('Error: ${response.message}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

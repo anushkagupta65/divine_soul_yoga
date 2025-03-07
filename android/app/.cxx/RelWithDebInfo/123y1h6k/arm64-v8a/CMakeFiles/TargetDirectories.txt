@@ -1,0 +1,2 @@
+C:/Users/DELL/Downloads/Projects/divine_soul_yoga/android/app/.cxx/RelWithDebInfo/123y1h6k/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/DELL/Downloads/Projects/divine_soul_yoga/android/app/.cxx/RelWithDebInfo/123y1h6k/arm64-v8a/CMakeFiles/rebuild_cache.dir
