@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -44,8 +45,20 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Future<void> createRazorpayOrder() async {
-    String keyId = "rzp_test_t9nKkE2yOuYEkA";
-    String keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
+    debugPrint("\n\ncreateRazorpayOrder() called...\n\n");
+
+    if (subsId.isEmpty) {
+      debugPrint("\n\nError: Subscription ID is empty. Cannot proceed.\n\n");
+      return;
+    }
+
+    String keyId = dotenv.env['razorpay_key_id'] ?? '';
+    String keySecret = dotenv.env['razorpay_key_secret'] ?? '';
+
+    if (keyId.isEmpty || keySecret.isEmpty) {
+      debugPrint("\n\nError: Razorpay API keys are missing.\n\n");
+      return;
+    }
 
     Map<String, dynamic> body = {
       "amount": amountInPaisa,
@@ -54,28 +67,36 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       "payment_capture": 1
     };
 
-    var response = await http.post(
-      Uri.https("api.razorpay.com", "/v1/orders"),
-      body: jsonEncode(body),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization':
-            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
-      },
-    );
+    try {
+      var response = await http.post(
+        Uri.https("api.razorpay.com", "/v1/orders"),
+        body: jsonEncode(body),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':
+              'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      String orderId = responseData['id'];
-      openCheckout(orderId);
-    } else {
-      debugPrint("Error creating Razorpay order: ${response.body}");
+      debugPrint("\n\nAPI Response: ${response.body}\n\n");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        String orderId = responseData['id'];
+        debugPrint("\n\nRazorpay Order Created: $orderId\n\n");
+        openCheckout(orderId);
+      } else {
+        debugPrint("\n\nError creating Razorpay order: ${response.body}\n\n");
+      }
+    } catch (e) {
+      debugPrint("\n\nException in createRazorpayOrder: $e\n\n");
     }
   }
 
   void openCheckout(String orderId) {
+    String key = dotenv.env['razorpay_key_id'] ?? '';
     var options = {
-      'key': 'rzp_test_t9nKkE2yOuYEkA',
+      'key': key,
       'amount': amountInPaisa,
       'name': selectedName,
       'description': selectedDescription,
@@ -84,28 +105,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
     try {
       _razorpay.open(options);
-    } catch (e) {
-      debugPrint('Error: $e');
+    } catch (e, stacktrace) {
+      debugPrint('\n\nRazorpay Checkout Error: $e\n\n');
+      debugPrint(stacktrace.toString());
     }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    debugPrint("\n\nPayment Successful! ID: ${response.paymentId}\n\n");
+
     bookSubs(
-      subscriptionId: int.parse(subsId),
+      subscriptionId: subsId.isNotEmpty ? int.parse(subsId) : 0,
       paymentId: response.paymentId!,
       orderId: response.orderId!,
     );
     isTapped = false;
-
-    // if (response.paymentId != null && response.orderId != null) {
-    //    bookSubs(
-    //     subscriptionId: int.parse(subsId),
-    //     paymentId: response.paymentId!,
-    //     orderId: response.orderId!,
-    //   );
-    // } else {
-    //   debugPrint("Payment ID or Order ID is null.");
-    // }
 
     showDialog(
       context: context,
@@ -125,13 +139,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   void _handlePaymentError(PaymentFailureResponse response) {
     isTapped = false;
+    debugPrint("\n\nPayment Failed: ${response.message}\n\n");
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Payment Failed'),
-        content: const Text('Error: Payment Failed.'),
-        // content: Text('Error: ${response.message}'),
+        content:
+            Text('Error: ${response.message}'), // Show actual error message
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -141,6 +156,122 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       ),
     );
   }
+
+  // bool isSubscribed = false;
+  // List<dynamic> subscriptions = [];
+  // bool isLoading = true;
+  // late Razorpay _razorpay;
+  // int amountInPaisa = 0;
+  // String subsId = '';
+  // String selectedName = '';
+  // String selectedDescription = '';
+  // int subid = 0;
+  // bool isTapped = false;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchSubscriptions();
+
+  //   _razorpay = Razorpay();
+  //   _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+  //   _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+  // }
+
+  // @override
+  // void dispose() {
+  //   _razorpay.clear();
+  //   super.dispose();
+  // }
+
+  // Future<void> createRazorpayOrder() async {
+  //   String keyId = dotenv.env['razorpay_key_id']!;
+  //   String keySecret = dotenv.env['razorpay_key_secret']!;
+
+  //   Map<String, dynamic> body = {
+  //     "amount": amountInPaisa,
+  //     "currency": "INR",
+  //     "receipt": "receipt#1",
+  //     "payment_capture": 1
+  //   };
+
+  //   var response = await http.post(
+  //     Uri.https("api.razorpay.com", "/v1/orders"),
+  //     body: jsonEncode(body),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization':
+  //           'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
+  //     },
+  //   );
+
+  //   if (response.statusCode == 200) {
+  //     final responseData = jsonDecode(response.body);
+  //     String orderId = responseData['id'];
+  //     openCheckout(orderId);
+  //   } else {
+  //     debugPrint("Error creating Razorpay order: ${response.body}");
+  //   }
+  // }
+
+  // void openCheckout(String orderId) {
+  //   var options = {
+  //     'key': 'rzp_test_t9nKkE2yOuYEkA',
+  //     'amount': amountInPaisa,
+  //     'name': selectedName,
+  //     'description': selectedDescription,
+  //     'order_id': orderId,
+  //   };
+
+  //   try {
+  //     _razorpay.open(options);
+  //   } catch (e) {
+  //     debugPrint('Error: $e');
+  //   }
+  // }
+
+  // void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  //   bookSubs(
+  //     subscriptionId: int.parse(subsId),
+  //     paymentId: response.paymentId!,
+  //     orderId: response.orderId!,
+  //   );
+  //   isTapped = false;
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Payment Successful'),
+  //       content: Text('Payment ID: ${response.paymentId}'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.push(
+  //               context, MaterialPageRoute(builder: (context) => HomeScreen())),
+  //           child: const Text('OK'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // void _handlePaymentError(PaymentFailureResponse response) {
+  //   isTapped = false;
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Payment Failed'),
+  //       content: const Text('Error: Payment Failed.'),
+  //       // content: Text('Error: ${response.message}'),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context),
+  //           child: const Text('OK'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Future<void> bookSubs({
     required int subscriptionId,
@@ -173,12 +304,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
       if (response.statusCode == 200) {
         debugPrint(response.body);
-        debugPrint('Subscription booked successfully.');
+        debugPrint('\n\nSubscription booked successfully.\n\n');
       } else {
-        debugPrint('Failed to book subscription: ${response.body}');
+        debugPrint('\n\nFailed to book subscription: ${response.body}\n\n');
       }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('\n\nError: $e');
     }
   }
 
@@ -304,8 +435,23 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             onPressed: subsId.isEmpty
                                 ? null
                                 : () {
-                                    isTapped ? null : createRazorpayOrder();
-                                    isTapped = true;
+                                    if (!isTapped) {
+                                      isTapped =
+                                          true; // Prevent multiple clicks
+                                      debugPrint(
+                                          "\n\nButton Pressed: Creating Razorpay Order...\n\n");
+                                      debugPrint(
+                                          "\n\nSubscription ID: $subsId\n\n");
+
+                                      createRazorpayOrder().then((_) {
+                                        isTapped =
+                                            false; // Reset after order creation attempt
+                                      }).catchError((error) {
+                                        debugPrint(
+                                            "\n\nError in createRazorpayOrder(): $error\n\n");
+                                        isTapped = false;
+                                      });
+                                    }
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: subsId.isEmpty

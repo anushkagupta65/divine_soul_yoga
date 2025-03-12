@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -110,8 +111,8 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
   }
 
   Future<void> createRazorpayOrder() async {
-    String keyId = "rzp_test_t9nKkE2yOuYEkA";
-    String keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
+    String keyId = dotenv.env['razorpay_key_id']!;
+    String keySecret = dotenv.env['razorpay_key_secret']!;
 
     Map<String, dynamic> body = {
       "amount": amountInPaisa * 100,
@@ -121,12 +122,12 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
     };
 
     var response = await http.post(
-      Uri.https("api.razorpay.com", "/v1/orders"), // Using https
-      body: jsonEncode(body), // Convert body to JSON
+      Uri.https("api.razorpay.com", "/v1/orders"),
+      body: jsonEncode(body),
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}' // Basic Auth header
+            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
       },
     );
 
@@ -143,8 +144,9 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
   }
 
   void openCheckout(String orderid) {
+    String key = dotenv.env['razorpay_key_id']!;
     var options = {
-      'key': 'rzp_test_t9nKkE2yOuYEkA', // Replace with your Razorpay key
+      'key': key,
       'amount': amountInPaisa * 100,
       'name': widget.eventData.title,
       'description': widget.eventData.title,

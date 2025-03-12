@@ -4,6 +4,7 @@ import 'package:divine_soul_yoga/src/presentation/home_screen/profile.dart';
 import 'package:divine_soul_yoga/src/presentation/login/login.dart';
 import 'package:divine_soul_yoga/src/provider/userprovider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +20,7 @@ void main() async {
       child: await initializeApp(),
     ),
   );
+  await dotenv.load(fileName: ".env");
 }
 
 Future<Widget> determineFirstScreen() async {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:divine_soul_yoga/src/presentation/home_screen/add_event_booking_info.dart';
 import 'package:divine_soul_yoga/src/models/eventmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -59,8 +60,8 @@ class _EventDetailsState extends State<EventDetails> {
   }
 
   Future<void> createRazorpayOrder() async {
-    String keyId = "rzp_test_t9nKkE2yOuYEkA";
-    String keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
+    String keyId = dotenv.env['razorpay_key_id']!;
+    String keySecret = dotenv.env['razorpay_key_secret']!;
 
     Map<String, dynamic> body = {
       "amount": amountInPaisa,
@@ -75,7 +76,7 @@ class _EventDetailsState extends State<EventDetails> {
       headers: {
         'Content-Type': 'application/json',
         'Authorization':
-            'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}' // Basic Auth header
+            'Basic ${base64Encode(utf8.encode('${keyId}:$keySecret'))}' // Basic Auth header
       },
     );
 
@@ -92,10 +93,10 @@ class _EventDetailsState extends State<EventDetails> {
   }
 
   void openCheckout(String orderid) {
+    String key = dotenv.env['razorpay_key_id']!;
     var options = {
-      'key': 'rzp_test_t9nKkE2yOuYEkA', // Replace with your Razorpay key
-      'amount': amountInPaisa *
-          100, // Amount in smallest currency unit (e.g., 50000 = ₹500.00)
+      'key': key,
+      'amount': amountInPaisa * 100,
       'name': widget.eventData.title,
       'description': widget.eventData.title,
       'order_id': orderid,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:divine_soul_yoga/src/presentation/home_screen/list_of_days.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,8 +63,8 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
   }
 
   Future<void> createRazorpayOrder() async {
-    const keyId = "rzp_test_t9nKkE2yOuYEkA";
-    const keySecret = "fLf4GyMehyvF4gY1IyaN0NxE";
+    String keyId = dotenv.env['razorpay_key_id']!;
+    String keySecret = dotenv.env['razorpay_key_secret']!;
 
     final body = {
       "amount": amountInPaisa,
@@ -93,8 +94,9 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
   }
 
   void openCheckout(String orderId) {
-    final options = {
-      'key': 'rzp_test_t9nKkE2yOuYEkA',
+    String key = dotenv.env['razorpay_key_id']!;
+    var options = {
+      'key': key,
       'amount': amountInPaisa * 100,
       'name': titleCourse,
       'description': titleCourse,
