@@ -63,8 +63,8 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
   }
 
   Future<void> createRazorpayOrder() async {
-    String keyId = dotenv.env['razorpay_key_id']!;
-    String keySecret = dotenv.env['razorpay_key_secret']!;
+    String keyId = dotenv.env['razorpay_live_key_id']!;
+    String keySecret = dotenv.env['razorpay_live_key_secret']!;
 
     final body = {
       "amount": amountInPaisa,
@@ -94,7 +94,7 @@ class _CourseOverviewScreenState extends State<CourseOverviewScreen> {
   }
 
   void openCheckout(String orderId) {
-    String key = dotenv.env['razorpay_key_id']!;
+    String key = dotenv.env['razorpay_live_key_id']!;
     var options = {
       'key': key,
       'amount': amountInPaisa * 100,

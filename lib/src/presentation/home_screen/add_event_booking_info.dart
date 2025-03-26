@@ -111,8 +111,8 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
   }
 
   Future<void> createRazorpayOrder() async {
-    String keyId = dotenv.env['razorpay_key_id']!;
-    String keySecret = dotenv.env['razorpay_key_secret']!;
+    String keyId = dotenv.env['razorpay_live_key_id']!;
+    String keySecret = dotenv.env['razorpay_live_key_secret']!;
 
     Map<String, dynamic> body = {
       "amount": amountInPaisa * 100,
@@ -144,7 +144,7 @@ class _AddEventBookingInfoState extends State<AddEventBookingInfo> {
   }
 
   void openCheckout(String orderid) {
-    String key = dotenv.env['razorpay_key_id']!;
+    String key = dotenv.env['razorpay_live_key_id']!;
     var options = {
       'key': key,
       'amount': amountInPaisa * 100,

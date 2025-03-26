@@ -52,8 +52,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       return;
     }
 
-    String keyId = dotenv.env['razorpay_key_id'] ?? '';
-    String keySecret = dotenv.env['razorpay_key_secret'] ?? '';
+    String keyId = dotenv.env['razorpay_live_key_id'] ?? '';
+    String keySecret = dotenv.env['razorpay_live_key_secret'] ?? '';
 
     if (keyId.isEmpty || keySecret.isEmpty) {
       debugPrint("\n\nError: Razorpay API keys are missing.\n\n");
@@ -94,7 +94,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   void openCheckout(String orderId) {
-    String key = dotenv.env['razorpay_key_id'] ?? '';
+    String key = dotenv.env['razorpay_live_key_id'] ?? '';
     var options = {
       'key': key,
       'amount': amountInPaisa,
@@ -156,122 +156,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       ),
     );
   }
-
-  // bool isSubscribed = false;
-  // List<dynamic> subscriptions = [];
-  // bool isLoading = true;
-  // late Razorpay _razorpay;
-  // int amountInPaisa = 0;
-  // String subsId = '';
-  // String selectedName = '';
-  // String selectedDescription = '';
-  // int subid = 0;
-  // bool isTapped = false;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   fetchSubscriptions();
-
-  //   _razorpay = Razorpay();
-  //   _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-  //   _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-  // }
-
-  // @override
-  // void dispose() {
-  //   _razorpay.clear();
-  //   super.dispose();
-  // }
-
-  // Future<void> createRazorpayOrder() async {
-  //   String keyId = dotenv.env['razorpay_key_id']!;
-  //   String keySecret = dotenv.env['razorpay_key_secret']!;
-
-  //   Map<String, dynamic> body = {
-  //     "amount": amountInPaisa,
-  //     "currency": "INR",
-  //     "receipt": "receipt#1",
-  //     "payment_capture": 1
-  //   };
-
-  //   var response = await http.post(
-  //     Uri.https("api.razorpay.com", "/v1/orders"),
-  //     body: jsonEncode(body),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization':
-  //           'Basic ${base64Encode(utf8.encode('$keyId:$keySecret'))}'
-  //     },
-  //   );
-
-  //   if (response.statusCode == 200) {
-  //     final responseData = jsonDecode(response.body);
-  //     String orderId = responseData['id'];
-  //     openCheckout(orderId);
-  //   } else {
-  //     debugPrint("Error creating Razorpay order: ${response.body}");
-  //   }
-  // }
-
-  // void openCheckout(String orderId) {
-  //   var options = {
-  //     'key': 'rzp_test_t9nKkE2yOuYEkA',
-  //     'amount': amountInPaisa,
-  //     'name': selectedName,
-  //     'description': selectedDescription,
-  //     'order_id': orderId,
-  //   };
-
-  //   try {
-  //     _razorpay.open(options);
-  //   } catch (e) {
-  //     debugPrint('Error: $e');
-  //   }
-  // }
-
-  // void _handlePaymentSuccess(PaymentSuccessResponse response) {
-  //   bookSubs(
-  //     subscriptionId: int.parse(subsId),
-  //     paymentId: response.paymentId!,
-  //     orderId: response.orderId!,
-  //   );
-  //   isTapped = false;
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text('Payment Successful'),
-  //       content: Text('Payment ID: ${response.paymentId}'),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.push(
-  //               context, MaterialPageRoute(builder: (context) => HomeScreen())),
-  //           child: const Text('OK'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  // void _handlePaymentError(PaymentFailureResponse response) {
-  //   isTapped = false;
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog(
-  //       title: const Text('Payment Failed'),
-  //       content: const Text('Error: Payment Failed.'),
-  //       // content: Text('Error: ${response.message}'),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(context),
-  //           child: const Text('OK'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Future<void> bookSubs({
     required int subscriptionId,
