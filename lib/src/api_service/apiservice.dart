@@ -1,20 +1,11 @@
 import 'dart:io';
-
-import 'package:divine_soul_yoga/src/presentation/home_screen/attended_event.dart';
-import 'package:divine_soul_yoga/src/presentation/home_screen/gallery.dart';
-import 'package:divine_soul_yoga/src/presentation/home_screen/our_team.dart';
 import 'package:divine_soul_yoga/src/models/blogmodel.dart';
 import 'package:divine_soul_yoga/src/models/eventmodel.dart';
 import 'package:divine_soul_yoga/src/models/studio_model.dart';
 import 'package:divine_soul_yoga/src/models/testimonialsmodel.dart';
-import 'package:divine_soul_yoga/src/models/usermodel.dart';
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../presentation/home_screen/meditation_course_list.dart';
 import '../models/atttendedevent.dart';
 import '../models/gallerymmodel.dart';
 import '../models/program_data_model.dart';
@@ -303,11 +294,7 @@ class ApiService {
 
       if (response.statusCode == 200) {
         print('ourteamData api called.................  ${response.body}');
-        // Decode the response body to JSON format
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
-
-        // Convert the 'data' part of the JSON response to a List<Event>
-        // List<OurTeam> ourteam =listFromJson(jsonResponse['data']);
         return jsonResponse['data'];
       } else {
         print('Failed to load ourteam: ${response.reasonPhrase}');

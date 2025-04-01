@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../provider/userprovider.dart';
 import 'home_screen.dart';
 
@@ -278,32 +277,40 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                             ? Colors.white
                                             : Colors.black),
                                   )
-                                : const Text("Subscribed",
+                                : Text(
+                                    "Already Subscribed\nValid till",
                                     style: TextStyle(
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.bold)),
+                                      color: Colors.green.shade700,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
                             selected: isSelected,
-                            onTap: () {
-                              setState(() {
-                                if (subsId == subscription['id'].toString()) {
-                                  // If already selected, unselect it
-                                  subsId = "";
-                                  subid = -1;
-                                  amountInPaisa = 0;
-                                  selectedName = "";
-                                  selectedDescription = "";
-                                } else {
-                                  // Otherwise, select the new item
-                                  subsId = subscription['id'].toString();
-                                  subid = subscription['id'];
-                                  amountInPaisa =
-                                      int.parse(subscription['amount']) * 100;
-                                  selectedName = subscription['name'];
-                                  selectedDescription =
-                                      subscription['description'];
-                                }
-                              });
-                            },
+                            onTap: profileProvider.profileData!["user"]
+                                        ["subscription_status"] ==
+                                    "0"
+                                ? () {
+                                    setState(() {
+                                      if (subsId ==
+                                          subscription['id'].toString()) {
+                                        subsId = "";
+                                        subid = -1;
+                                        amountInPaisa = 0;
+                                        selectedName = "";
+                                        selectedDescription = "";
+                                      } else {
+                                        subsId = subscription['id'].toString();
+                                        subid = subscription['id'];
+                                        amountInPaisa =
+                                            int.parse(subscription['amount']) *
+                                                100;
+                                        selectedName = subscription['name'];
+                                        selectedDescription =
+                                            subscription['description'];
+                                      }
+                                    });
+                                  }
+                                : null,
                           ),
                         );
                       },
@@ -320,16 +327,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 ? null
                                 : () {
                                     if (!isTapped) {
-                                      isTapped =
-                                          true; // Prevent multiple clicks
+                                      isTapped = true;
                                       debugPrint(
                                           "\n\nButton Pressed: Creating Razorpay Order...\n\n");
                                       debugPrint(
                                           "\n\nSubscription ID: $subsId\n\n");
 
                                       createRazorpayOrder().then((_) {
-                                        isTapped =
-                                            false; // Reset after order creation attempt
+                                        isTapped = false;
                                       }).catchError((error) {
                                         debugPrint(
                                             "\n\nError in createRazorpayOrder(): $error\n\n");

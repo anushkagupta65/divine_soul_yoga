@@ -356,7 +356,9 @@ class _EventDetailsState extends State<EventDetails> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xffD45700),
+                    backgroundColor: widget.eventData.isExpired == 1
+                        ? Colors.grey // Disabled button color
+                        : const Color(0xffD45700), // Normal button color
                     foregroundColor: const Color(0xffFFFFFF),
                     padding:
                         const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
@@ -364,19 +366,26 @@ class _EventDetailsState extends State<EventDetails> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () {
-                    widget.eventData.paid != true
-                        ? Navigator.push(
-                            context,
-                            MaterialPageRoute(
+                  onPressed: widget.eventData.isExpired == 1
+                      ? null // Disables the button if the event is expired
+                      : () {
+                          if (widget.eventData.paid != true) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
                                 builder: (context) => AddEventBookingInfo(
-                                      eventData: widget.eventData,
-                                    )),
-                          )
-                        : null;
-                  },
+                                  eventData: widget.eventData,
+                                ),
+                              ),
+                            );
+                          }
+                        },
                   child: Text(
-                    widget.eventData.paid != true ? 'Book Event' : "Booked",
+                    widget.eventData.isExpired == 1
+                        ? "Expired" // Show "Expired" if event is expired
+                        : (widget.eventData.paid != true
+                            ? "Book Event"
+                            : "Booked"),
                     style: const TextStyle(fontSize: 18),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

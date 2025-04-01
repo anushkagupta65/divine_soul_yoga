@@ -12,6 +12,7 @@ class EventModel {
   final String amount;
   final String contactNumber;
   final bool paid;
+  final int isExpired;
 
   EventModel({
     required this.id,
@@ -27,23 +28,26 @@ class EventModel {
     required this.amount,
     required this.contactNumber,
     required this.paid,
+    required this.isExpired,
   });
 
   factory EventModel.fromJson(Map<String, dynamic> json) {
     return EventModel(
-        id: json['id'],
-        description: json['description'],
-        startDatetime: json['start_datetime'],
-        endDatetime: json['end_datetime'],
-        image: json['image'],
-        status: json['status'],
-        title: json['title'],
-        stateId: json['state_id'],
-        location: json['location'],
-        trainer: json['trainer'],
-        amount: json['amount'],
-        contactNumber: json['contact_number'],
-        paid: json['paid']);
+      id: json['id'],
+      description: json['description'],
+      startDatetime: json['start_datetime'],
+      endDatetime: json['end_datetime'],
+      image: json['image'],
+      status: json['status'],
+      title: json['title'],
+      stateId: json['state_id'],
+      location: json['location'],
+      trainer: json['trainer'],
+      amount: json['amount'],
+      contactNumber: json['contact_number'],
+      paid: json['paid'],
+      isExpired: json['is_expired'],
+    );
   }
 
   // Add this method to convert a list of JSON objects into a list of EventModel objects

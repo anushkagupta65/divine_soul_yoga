@@ -236,7 +236,9 @@ class _EventsState extends State<Events> {
                                                   _getButtonLabel(
                                                       filteredEvents[index]
                                                           .status
-                                                          .toString()),
+                                                          .toString(),
+                                                      filteredEvents,
+                                                      index),
                                                   style: const TextStyle(
                                                       fontSize: 12),
                                                   maxLines: 1,
@@ -307,15 +309,16 @@ class _EventsState extends State<Events> {
   }
 }
 
-String _getButtonLabel(String status) {
-  switch (status) {
-    case 'Active':
-      return 'Attend';
-    case 'Pending':
-      return 'Coming Soon';
-    case 'Completed':
-      return 'Ended';
-    default:
-      return 'Event';
+String _getButtonLabel(
+    String status, List<EventModel> filteredEvents, int index) {
+  if (filteredEvents[index].isExpired == 1) {
+    return "Expired";
   }
+
+  return switch (status) {
+    'Active' => 'Attend',
+    'Pending' => 'Coming Soon',
+    'Completed' => 'Ended',
+    _ => 'Event',
+  };
 }
