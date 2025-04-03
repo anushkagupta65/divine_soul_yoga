@@ -33,25 +33,22 @@ Future<Widget> determineFirstScreen() async {
     log("User ID: $userId, Name: $name");
 
     if (userId != null && userId.isNotEmpty) {
-      // If user is logged in but name is null, redirect to Profile
       if (name == null || name.isEmpty) {
-        // Pass the userId to Profile page
         return Profile(
           index: "0",
-          userId: userId, // Add userId parameter if needed by Profile widget
+          userId: userId,
         );
       } else {
-        // Pass necessary data to HomeScreen
         return HomeScreen(
-          userId: userId, // Add userId parameter if needed by HomeScreen widget
+          userId: userId,
         );
       }
     } else {
-      return Login();
+      return const Login();
     }
   } catch (e) {
     log("Error in determineFirstScreen: $e");
-    return Login();
+    return const Login();
   }
 }
 

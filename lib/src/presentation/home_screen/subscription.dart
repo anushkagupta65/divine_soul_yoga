@@ -18,6 +18,7 @@ class SubscriptionScreen extends StatefulWidget {
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   bool isSubscribed = false;
   List<dynamic> subscriptions = [];
+  List<dynamic> ifSubscribed = [];
   bool isLoading = true;
   late Razorpay _razorpay;
   int amountInPaisa = 0;
@@ -30,24 +31,32 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   void initState() {
     super.initState();
-    fetchSubscriptions();
-
+    debugPrint('DEBUG: initState called');
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final profileProvider = Provider.of<Userprovider>(context, listen: false);
+    await profileProvider.fetchProfileData();
+    await fetchSubscriptions();
+    await subscribed();
   }
 
   @override
   void dispose() {
+    debugPrint('DEBUG: dispose called');
     _razorpay.clear();
     super.dispose();
   }
 
   Future<void> createRazorpayOrder() async {
-    debugPrint("\n\ncreateRazorpayOrder() called...\n\n");
-
+    debugPrint('DEBUG: createRazorpayOrder called with subsId: $subsId');
     if (subsId.isEmpty) {
-      debugPrint("\n\nError: Subscription ID is empty. Cannot proceed.\n\n");
+      debugPrint("Error: Subscription ID is empty. Cannot proceed.");
       return;
     }
 
@@ -55,7 +64,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     String keySecret = dotenv.env['razorpay_live_key_secret'] ?? '';
 
     if (keyId.isEmpty || keySecret.isEmpty) {
-      debugPrint("\n\nError: Razorpay API keys are missing.\n\n");
+      debugPrint("Error: Razorpay API keys are missing.");
       return;
     }
 
@@ -77,18 +86,18 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         },
       );
 
-      debugPrint("\n\nAPI Response: ${response.body}\n\n");
+      debugPrint("API Response: ${response.body}");
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         String orderId = responseData['id'];
-        debugPrint("\n\nRazorpay Order Created: $orderId\n\n");
+        debugPrint("Razorpay Order Created: $orderId");
         openCheckout(orderId);
       } else {
-        debugPrint("\n\nError creating Razorpay order: ${response.body}\n\n");
+        debugPrint("Error creating Razorpay order: ${response.body}");
       }
     } catch (e) {
-      debugPrint("\n\nException in createRazorpayOrder: $e\n\n");
+      debugPrint("Exception in createRazorpayOrder: $e");
     }
   }
 
@@ -105,19 +114,34 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     try {
       _razorpay.open(options);
     } catch (e, stacktrace) {
-      debugPrint('\n\nRazorpay Checkout Error: $e\n\n');
+      debugPrint('Razorpay Checkout Error: $e');
       debugPrint(stacktrace.toString());
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    debugPrint("\n\nPayment Successful! ID: ${response.paymentId}\n\n");
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    debugPrint('DEBUG: Payment Success - Payment ID: ${response.paymentId}');
+    debugPrint('DEBUG: Order ID: ${response.orderId}');
 
-    bookSubs(
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userIdString = prefs.getString('user_id');
+    int userId = int.tryParse(userIdString ?? '0') ?? 0;
+    String purchaseDate =
+        DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
+
+    await bookSubs(
+      userId: userId,
       subscriptionId: subsId.isNotEmpty ? int.parse(subsId) : 0,
       paymentId: response.paymentId!,
       orderId: response.orderId!,
-    );
+      purchaseDate: purchaseDate,
+    ).then((_) {
+      debugPrint('DEBUG: Refreshing data after success');
+      final profileProvider = Provider.of<Userprovider>(context, listen: false);
+      profileProvider.fetchProfileData();
+      subscribed();
+    });
+
     isTapped = false;
 
     showDialog(
@@ -138,14 +162,13 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   void _handlePaymentError(PaymentFailureResponse response) {
     isTapped = false;
-    debugPrint("\n\nPayment Failed: ${response.message}\n\n");
+    debugPrint("Payment Failed: ${response.message}");
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Payment Failed'),
-        content:
-            Text('Error: ${response.message}'), // Show actual error message
+        content: Text('Error: ${response.message}'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -157,64 +180,120 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Future<void> bookSubs({
+    required int userId,
     required int subscriptionId,
     required String paymentId,
     required String orderId,
+    required String purchaseDate,
   }) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString('user_id');
+    debugPrint('DEBUG: bookSubs called with subscriptionId: $subscriptionId');
+    debugPrint('DEBUG: userId: $userId');
     const String url =
         'https://divinesoulyoga.in/api/subscription-purchased-data';
 
-    // Format the current date
-    String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
-
-    // Convert all fields to strings
     final Map<String, dynamic> body = {
-      'user_id': userId ?? '', // Ensure this is a string
-      'subscription_id': subscriptionId.toString(), // Convert int to string
-      'purchase_date': formattedDate, // Already a string
-      'order_id': orderId, // Already a string
-      'transaction_id': paymentId, // Already a string
-      'status': "1", // Explicitly set as string
+      'user_id': userId,
+      'subscription_id': subscriptionId,
+      'transaction_id': paymentId,
+      'order_id': orderId,
+      'purchase_date': purchaseDate,
     };
+
+    debugPrint('DEBUG: bookSubs request body: $body');
 
     try {
       final response = await http.post(
         Uri.parse(url),
-        body: body,
+        body: jsonEncode(body),
+        headers: {'Content-Type': 'application/json'},
       );
+      debugPrint('DEBUG: bookSubs response status: ${response.statusCode}');
+      debugPrint('DEBUG: bookSubs response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        debugPrint(response.body);
-        debugPrint('\n\nSubscription booked successfully.\n\n');
+        debugPrint('DEBUG: Subscription booked successfully');
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('subscriptionCheck', "1");
       } else {
-        debugPrint('\n\nFailed to book subscription: ${response.body}\n\n');
+        debugPrint('DEBUG: Failed to book subscription: ${response.body}');
       }
     } catch (e) {
-      debugPrint('\n\nError: $e');
+      debugPrint('DEBUG: bookSubs error: $e');
     }
   }
 
   Future<void> fetchSubscriptions() async {
+    debugPrint('DEBUG: fetchSubscriptions called');
+    setState(() => isLoading = true);
     try {
       final response = await http
           .get(Uri.parse('https://divinesoulyoga.in/api/subscription-Data'));
+      debugPrint('DEBUG: fetchSubscriptions status: ${response.statusCode}');
+      debugPrint('DEBUG: fetchSubscriptions response: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          subscriptions = data['data'];
+          subscriptions = data['data'] ?? [];
           isLoading = false;
         });
+        debugPrint(
+            'DEBUG: Available subscriptions count: ${subscriptions.length}');
       } else {
         throw Exception('Failed to load subscriptions');
       }
     } catch (error) {
-      setState(() {
-        isLoading = false;
-      });
+      debugPrint('DEBUG: fetchSubscriptions error: $error');
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error fetching subscriptions: $error')),
+      );
+    }
+  }
+
+  Future<void> subscribed() async {
+    debugPrint('DEBUG: subscribed called');
+    setState(() => isLoading = true);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('user_id');
+    debugPrint('DEBUG: User ID for subscribed fetch: $userId');
+
+    if (userId == null || userId.isEmpty) {
+      debugPrint('DEBUG: No user ID found');
+      setState(() {
+        ifSubscribed = [];
+        isLoading = false;
+        isSubscribed = false;
+      });
+      return;
+    }
+
+    try {
+      final response = await http.get(Uri.parse(
+          'https://divinesoulyoga.in/api/user-subscriptions?user_id=$userId'));
+      debugPrint('DEBUG: subscribed status: ${response.statusCode}');
+      debugPrint('DEBUG: subscribed response: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          ifSubscribed = data['data'] ?? [];
+          isLoading = false;
+          isSubscribed = ifSubscribed.isNotEmpty;
+        });
+        debugPrint('DEBUG: Subscribed plans count: ${ifSubscribed.length}');
+      } else {
+        throw Exception('Failed to load subscribed plans');
+      }
+    } catch (error) {
+      debugPrint('DEBUG: subscribed error: $error');
+      setState(() {
+        ifSubscribed = [];
+        isLoading = false;
+        isSubscribed = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching subscribed plans: $error')),
       );
     }
   }
@@ -222,6 +301,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   Widget build(BuildContext context) {
     final profileProvider = Provider.of<Userprovider>(context);
+    debugPrint('DEBUG: Building UI');
+    debugPrint('DEBUG: Profile data: ${profileProvider.profileData}');
 
     return Scaffold(
       appBar: AppBar(
@@ -232,16 +313,91 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Image.asset('assets/images/group1.png'),
-                  // const SizedBox(
-                  //   height: 20,
-                  // ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: ListView.builder(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (ifSubscribed.isNotEmpty) ...[
+                      const Text(
+                        'Your Active Subscriptions',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xffD45700),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ListView.builder(
+                        itemCount: ifSubscribed.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final subscription = ifSubscribed[index];
+                          return Card(
+                            elevation: 2,
+                            color: const Color.fromARGB(255, 234, 246, 236),
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        subscription['subscription_name'] ??
+                                            'Unnamed Plan',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green.shade600,
+                                        ),
+                                      ),
+                                      Chip(
+                                        label: const Text('Active'),
+                                        backgroundColor: Colors.green.shade600,
+                                        labelStyle: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                    ],
+                                  ),
+                                  Text(
+                                    'Valid till: ${subscription['end_date'] ?? 'N/A'}',
+                                    style: TextStyle(
+                                      color: Colors.green.shade600,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                    ] else
+                      const Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text(
+                          'No Active Subscriptions',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Available Subscription Plans',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xffD45700),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ListView.builder(
                       itemCount: subscriptions.length,
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
@@ -250,16 +406,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                         final isSelected =
                             subscription['id'].toString() == subsId;
                         return Card(
+                          elevation: 2,
                           color: isSelected
                               ? const Color(0xffD45700)
-                              : Colors.white70,
+                              : Colors.white,
+                          margin: const EdgeInsets.only(bottom: 8),
                           child: ListTile(
+                            contentPadding: const EdgeInsets.all(12),
                             title: Text(
                               "${subscription['name']} - ${subscription['validity']} ${subscription['validity'] == "1" ? 'month' : 'months'}",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color:
-                                      isSelected ? Colors.white : Colors.black),
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
                             ),
                             subtitle: Text(
                               subscription['description'],
@@ -267,101 +426,87 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 color: isSelected ? Colors.white : Colors.black,
                               ),
                             ),
-                            trailing: profileProvider.profileData!["user"]
-                                        ["subscription_status"] ==
-                                    "0"
-                                ? Text(
-                                    '₹${subscription['amount']}',
-                                    style: TextStyle(
-                                        color: isSelected
-                                            ? Colors.white
-                                            : Colors.black),
-                                  )
-                                : Text(
-                                    "Already Subscribed\nValid till",
-                                    style: TextStyle(
-                                      color: Colors.green.shade700,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                            selected: isSelected,
-                            onTap: profileProvider.profileData!["user"]
-                                        ["subscription_status"] ==
-                                    "0"
-                                ? () {
-                                    setState(() {
-                                      if (subsId ==
-                                          subscription['id'].toString()) {
-                                        subsId = "";
-                                        subid = -1;
-                                        amountInPaisa = 0;
-                                        selectedName = "";
-                                        selectedDescription = "";
-                                      } else {
-                                        subsId = subscription['id'].toString();
-                                        subid = subscription['id'];
-                                        amountInPaisa =
-                                            int.parse(subscription['amount']) *
-                                                100;
-                                        selectedName = subscription['name'];
-                                        selectedDescription =
-                                            subscription['description'];
-                                      }
-                                    });
-                                  }
-                                : null,
+                            trailing: Text(
+                              '₹${subscription['amount']}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                if (subsId == subscription['id'].toString()) {
+                                  subsId = "";
+                                  subid = -1;
+                                  amountInPaisa = 0;
+                                  selectedName = "";
+                                  selectedDescription = "";
+                                } else {
+                                  subsId = subscription['id'].toString();
+                                  subid = subscription['id'];
+                                  amountInPaisa =
+                                      int.parse(subscription['amount']) * 100;
+                                  selectedName = subscription['name'];
+                                  selectedDescription =
+                                      subscription['description'];
+                                }
+                              });
+                            },
                           ),
                         );
                       },
                     ),
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  profileProvider.profileData!["user"]["subscription_status"] ==
-                          "0"
-                      ? Center(
-                          child: ElevatedButton(
-                            onPressed: subsId.isEmpty
-                                ? null
-                                : () {
-                                    if (!isTapped) {
-                                      isTapped = true;
-                                      debugPrint(
-                                          "\n\nButton Pressed: Creating Razorpay Order...\n\n");
-                                      debugPrint(
-                                          "\n\nSubscription ID: $subsId\n\n");
-
-                                      createRazorpayOrder().then((_) {
-                                        isTapped = false;
-                                      }).catchError((error) {
-                                        debugPrint(
-                                            "\n\nError in createRazorpayOrder(): $error\n\n");
-                                        isTapped = false;
-                                      });
-                                    }
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: subsId.isEmpty
-                                  ? Colors.grey
-                                  : const Color(0xffD45700),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 15),
-                              textStyle: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            child: Text(
-                              'Buy Subscription',
-                              style: TextStyle(
-                                color:
-                                    subsId.isEmpty ? Colors.grey : Colors.white,
-                              ),
-                            ),
-                          ),
-                        )
-                      : const SizedBox()
-                ],
+                    const SizedBox(height: 30),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: subsId.isEmpty
+                            ? null
+                            : () {
+                                debugPrint(
+                                    'DEBUG: Buy button pressed with subsId: $subsId');
+                                if (isSubscribed) {
+                                  debugPrint('DEBUG: User already subscribed');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'You already have an active subscription'),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                if (!isTapped) {
+                                  isTapped = true;
+                                  debugPrint(
+                                      "Button Pressed: Creating Razorpay Order...");
+                                  createRazorpayOrder().then((_) {
+                                    isTapped = false;
+                                  }).catchError((error) {
+                                    debugPrint(
+                                        "Error in createRazorpayOrder(): $error");
+                                    isTapped = false;
+                                  });
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: subsId.isEmpty
+                              ? Colors.grey
+                              : const Color(0xffD45700),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 15),
+                          textStyle: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        child: Text(
+                          'Buy Subscription',
+                          style: TextStyle(
+                              color:
+                                  subsId.isEmpty ? Colors.grey : Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
     );

@@ -3,45 +3,45 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Userprovider extends ChangeNotifier {
-  ApiService apiService = new ApiService();
-  Map<String, dynamic>? _profileData; // Holds the profile data
-  bool _isLoading = false; // Tracks loading state
-  String? _errorMessage; // Holds error messages
+  ApiService apiService = ApiService();
+  Map<String, dynamic>? _profileData;
+  bool _isLoading = false;
+  String? _errorMessage;
 
   Map<String, dynamic>? get profileData => _profileData;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+
   Future<void> fetchProfileData() async {
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners(); // Notify UI about loading state
+    notifyListeners();
 
     try {
-      final result =
-          await apiService.postProfileData(); // Call your API function
+      final result = await apiService.postProfileData();
+      debugPrint("Full API Response: ${result.toString()}"); // Detailed logging
       if (result['success']) {
-        print("Result in Provider ${result['success']}");
-
+        debugPrint(
+            "Subscription Status from API: ${result['data']['user']['subscription_status']}");
         _profileData = result['data'];
-        print('User Data.....> ${result['data']}');
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString(
             'subscriptionCheck', result['data']['user']['subscription_status']);
-        print("profile Data in provider${_profileData.toString()} ");
+        debugPrint(
+            "Stored subscriptionCheck in SharedPreferences: ${result['data']['user']['subscription_status']}");
         notifyListeners();
-        // Update profile data
       } else {
-        _errorMessage = result['message']; // Update error message
+        _errorMessage = result['message'];
         _isLoading = false;
         notifyListeners();
       }
     } catch (e) {
       _isLoading = false;
-      _errorMessage = 'Something went wrong: $e'; // Handle exceptions
+      _errorMessage = 'Something went wrong: $e';
       notifyListeners();
     } finally {
       _isLoading = false;
-      notifyListeners(); // Notify UI about state changes
+      notifyListeners();
     }
   }
 }

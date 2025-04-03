@@ -34,12 +34,13 @@ class _ContactUsState extends State<ContactUs> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Contact Us',
           style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w400,
-              color: Color(0xffD45700)),
+            fontSize: 30,
+            fontWeight: FontWeight.w400,
+            color: Color(0xffD45700),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -52,7 +53,7 @@ class _ContactUsState extends State<ContactUs> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(top: 10.0, left: 20),
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.900,
                       child: Image.asset(
                         'assets/images/frame1.png',
@@ -61,32 +62,29 @@ class _ContactUsState extends State<ContactUs> {
                     ),
                   ),
                   Center(
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: Column(
                         children: [
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 40.0, right: 30),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 40.0, right: 30),
                             child: Text(
                               "Contact Information",
                               style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color(0xffFFFFFF)),
+                                fontSize: 20,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xffFFFFFF),
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(
-                              top: 15.0,
-                              right: 20,
-                            ),
-                            child: Image.asset('assets/images/ct1.png'),
-                          ),
-                          Padding(
                             padding:
                                 const EdgeInsets.only(top: 15.0, right: 20),
+                            child: Image.asset('assets/images/ct1.png'),
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 15.0, right: 20),
                             child: Text(
                               "+91-91154 92700",
                               style: TextStyle(color: Color(0xffFFFFFF)),
@@ -97,9 +95,8 @@ class _ContactUsState extends State<ContactUs> {
                                 const EdgeInsets.only(top: 15.0, right: 20),
                             child: Image.asset('assets/images/ct2.png'),
                           ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.only(top: 15.0, right: 20),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 15.0, right: 20),
                             child: Text(
                               'info@divinesoulyoga.com',
                               style: TextStyle(color: Color(0xffFFFFFF)),
@@ -108,15 +105,23 @@ class _ContactUsState extends State<ContactUs> {
                           Padding(
                             padding:
                                 const EdgeInsets.only(top: 15.0, right: 20),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width * 0.50,
+                            child: SizedBox(
+                              width: double.infinity,
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Image.asset('assets/images/sc1.png'),
-                                  Image.asset('assets/images/sc2.png'),
-                                  Image.asset('assets/images/sc3.png'),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset('assets/images/sc1.png'),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset('assets/images/sc2.png'),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset('assets/images/sc3.png'),
+                                  ),
                                 ],
                               ),
                             ),
@@ -129,14 +134,14 @@ class _ContactUsState extends State<ContactUs> {
               ),
 
               // Inquiry Section
-              Padding(
-                padding: const EdgeInsets.all(20.0),
+              const Padding(
+                padding: EdgeInsets.all(20.0),
                 child: Text(
                   'Send us an inquiry',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400),
                 ),
               ),
-              Container(
+              const Padding(
                 padding: EdgeInsets.all(20),
                 child: Text(
                   'Interested in joining our classes but feeling intimidated? Don’t be. Send us a note!',
@@ -147,11 +152,12 @@ class _ContactUsState extends State<ContactUs> {
 
               // Name Field
               Container(
-                margin: EdgeInsets.all(20),
+                margin: const EdgeInsets.all(20),
                 child: TextFormField(
                   controller: _nameController,
-                  style: TextStyle(fontSize: 16, color: Color(0xffD45700)),
-                  decoration: InputDecoration(
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xffD45700)),
+                  decoration: const InputDecoration(
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Color(0xffD45700)),
                     ),
@@ -177,11 +183,12 @@ class _ContactUsState extends State<ContactUs> {
 
               // Email Field
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
+                margin: const EdgeInsets.all(20),
                 child: TextFormField(
                   controller: _emailController,
-                  style: TextStyle(fontSize: 16, color: Color(0xffD45700)),
-                  decoration: InputDecoration(
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xffD45700)),
+                  decoration: const InputDecoration(
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Color(0xffD45700)),
                     ),
@@ -209,12 +216,13 @@ class _ContactUsState extends State<ContactUs> {
 
               // Phone Field
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(20),
                 child: TextFormField(
                   controller: _phoneController,
-                  style: TextStyle(fontSize: 16, color: Color(0xffD45700)),
+                  style:
+                      const TextStyle(fontSize: 16, color: Color(0xffD45700)),
                   keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Color(0xffD45700)),
                     ),
@@ -248,10 +256,10 @@ class _ContactUsState extends State<ContactUs> {
                   maxLines: 5,
                   decoration: InputDecoration(
                     hintText: "Write your message...",
-                    hintStyle: TextStyle(color: Color(0xff8D8D8D)),
+                    hintStyle: const TextStyle(color: Color(0xff8D8D8D)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Color(0xffD45700)),
+                      borderSide: const BorderSide(color: Color(0xffD45700)),
                     ),
                   ),
                   validator: (value) {
@@ -281,7 +289,8 @@ class _ContactUsState extends State<ContactUs> {
                         );
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Message sent successfully!')),
+                          const SnackBar(
+                              content: Text('Message sent successfully!')),
                         );
 
                         _nameController.clear();
@@ -290,16 +299,16 @@ class _ContactUsState extends State<ContactUs> {
                         _messageController.clear();
                       }
                     },
-                    child: Text(
+                    child: const Text(
                       'Send Message',
                       style:
                           TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xffD45700),
+                      backgroundColor: const Color(0xffD45700),
                       foregroundColor: Colors.white,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
                       ),
