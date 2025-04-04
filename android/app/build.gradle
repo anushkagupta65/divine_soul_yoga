@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.divinesoul.yoga"
-    compileSdk = flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

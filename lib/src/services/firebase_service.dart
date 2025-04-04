@@ -7,7 +7,6 @@ class FirebaseService {
 
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    // Request permission for notifications
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
       badge: true,

@@ -4,6 +4,7 @@ import 'package:divine_soul_yoga/src/presentation/home_screen/profile.dart';
 import 'package:divine_soul_yoga/src/presentation/login/login.dart';
 import 'package:divine_soul_yoga/src/provider/userprovider.dart';
 import 'package:divine_soul_yoga/src/services/firebase_service.dart';
+import 'package:divine_soul_yoga/src/services/work_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,6 +14,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FirebaseService.initializeFirebase();
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? endDate = prefs.getString('subscription_end_date');
+  if (endDate != null) {
+    await scheduleExpirationCheck();
+  }
 
   runApp(
     MultiProvider(

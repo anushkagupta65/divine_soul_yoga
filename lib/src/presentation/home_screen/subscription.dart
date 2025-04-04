@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:divine_soul_yoga/src/services/work_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:divine_soul_yoga/src/services/notifications.dart';
 import '../../provider/userprovider.dart';
 import 'home_screen.dart';
 
@@ -27,6 +29,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   String selectedDescription = '';
   int subid = 0;
   bool isTapped = false;
+  bool hasEverSubscribed = false;
 
   @override
   void initState() {
@@ -36,6 +39,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
 
+    initializeNotifications();
     _loadData();
   }
 
@@ -44,6 +48,29 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     await profileProvider.fetchProfileData();
     await fetchSubscriptions();
     await subscribed();
+    await _checkSubscriptionHistory();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? endDate = prefs.getString('subscription_end_date');
+    if (endDate != null && ifSubscribed.isNotEmpty) {
+      scheduleExpirationCheck();
+    }
+  }
+
+  Future<void> _setTestSubscriptionDate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DateTime testDate = DateTime.now().add(const Duration(days: 3));
+    await prefs.setString('subscription_end_date', testDate.toIso8601String());
+    await scheduleExpirationCheck();
+    debugPrint('DEBUG: Test subscription date set to $testDate');
+  }
+
+  Future<void> _checkSubscriptionHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool everSubscribed = prefs.getBool('hasEverSubscribed') ?? false;
+    setState(() {
+      hasEverSubscribed = everSubscribed || ifSubscribed.isNotEmpty;
+    });
   }
 
   @override
@@ -135,11 +162,22 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       paymentId: response.paymentId!,
       orderId: response.orderId!,
       purchaseDate: purchaseDate,
-    ).then((_) {
+    ).then((_) async {
       debugPrint('DEBUG: Refreshing data after success');
       final profileProvider = Provider.of<Userprovider>(context, listen: false);
       profileProvider.fetchProfileData();
-      subscribed();
+      await subscribed();
+
+      prefs.setBool('hasEverSubscribed', true);
+      if (ifSubscribed.isNotEmpty) {
+        String endDate = ifSubscribed[0]['end_date'];
+        await prefs.setString('subscription_end_date', endDate);
+        scheduleExpirationCheck();
+      }
+
+      setState(() {
+        hasEverSubscribed = true;
+      });
     });
 
     isTapped = false;
@@ -318,6 +356,15 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: ElevatedButton(
+                          onPressed: _setTestSubscriptionDate,
+                          child: const Text('Set Test Subscription Date'),
+                        ),
+                      ),
+                    ),
                     if (ifSubscribed.isNotEmpty) ...[
                       const Text(
                         'Your Active Subscriptions',
@@ -444,7 +491,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   selectedDescription = "";
                                 } else {
                                   subsId = subscription['id'].toString();
-                                  subid = subscription['id'];
+                                  subid = subscription[
+                                      'idOpacityChanges Requested by Client id'];
                                   amountInPaisa =
                                       int.parse(subscription['amount']) * 100;
                                   selectedName = subscription['name'];
@@ -464,7 +512,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             ? null
                             : () {
                                 debugPrint(
-                                    'DEBUG: Buy button pressed with subsId: $subsId');
+                                    'DEBUG: Button pressed with subsId: $subsId');
                                 if (isSubscribed) {
                                   debugPrint('DEBUG: User already subscribed');
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -498,7 +546,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         child: Text(
-                          'Buy Subscription',
+                          hasEverSubscribed
+                              ? 'Renew Subscription'
+                              : 'Buy Subscription',
                           style: TextStyle(
                               color:
                                   subsId.isEmpty ? Colors.grey : Colors.white),
