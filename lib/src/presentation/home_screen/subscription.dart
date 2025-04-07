@@ -7,9 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:divine_soul_yoga/src/services/notifications.dart';
 import '../../provider/userprovider.dart';
-import 'home_screen.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -39,7 +37,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
 
-    initializeNotifications();
     _loadData();
   }
 
@@ -87,8 +84,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       return;
     }
 
-    String keyId = dotenv.env['razorpay_live_key_id'] ?? '';
-    String keySecret = dotenv.env['razorpay_live_key_secret'] ?? '';
+    String keyId = dotenv.env['razorpay_test_key_id'] ?? '';
+    String keySecret = dotenv.env['razorpay_test_key_secret'] ?? '';
 
     if (keyId.isEmpty || keySecret.isEmpty) {
       debugPrint("Error: Razorpay API keys are missing.");
@@ -129,7 +126,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   void openCheckout(String orderId) {
-    String key = dotenv.env['razorpay_live_key_id'] ?? '';
+    String key = dotenv.env['razorpay_test_key_id'] ?? '';
     var options = {
       'key': key,
       'amount': amountInPaisa,
@@ -177,6 +174,11 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
       setState(() {
         hasEverSubscribed = true;
+        subsId = '';
+        amountInPaisa = 0;
+        selectedName = '';
+        selectedDescription = '';
+        subid = 0;
       });
     });
 
@@ -189,8 +191,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         content: Text('Payment ID: ${response.paymentId}'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.push(
-                context, MaterialPageRoute(builder: (context) => HomeScreen())),
+            onPressed: () {
+              Navigator.pop(context);
+            },
             child: const Text('OK'),
           ),
         ],
@@ -491,8 +494,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   selectedDescription = "";
                                 } else {
                                   subsId = subscription['id'].toString();
-                                  subid = subscription[
-                                      'idOpacityChanges Requested by Client id'];
+                                  subid = subscription['id'];
                                   amountInPaisa =
                                       int.parse(subscription['amount']) * 100;
                                   selectedName = subscription['name'];
